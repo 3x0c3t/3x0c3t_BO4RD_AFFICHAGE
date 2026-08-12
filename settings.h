@@ -1,0 +1,29 @@
+#ifndef SETTINGS_H
+#define SETTINGS_H
+
+#define SCREEN_WIDTH  240
+#define SCREEN_HEIGHT 320
+
+#define SERIAL_BAUDRATE 115200
+
+#define TFT_BACKGROUND TFT_BLACK
+
+#define BUTTON_W 100
+#define BUTTON_H 42
+
+#define BUTTON_X1 10
+#define BUTTON_X2 130
+
+#define BUTTON_Y1 72
+#define BUTTON_Y2 122
+#define BUTTON_Y3 172
+#define BUTTON_Y4 222
+
+#define FULL_BUTTON_X 10
+#define FULL_BUTTON_Y 272
+#define FULL_BUTTON_W 220
+#define FULL_BUTTON_H 38
+
+#define TOUCH_MIN_Z 200
+
+#endif
