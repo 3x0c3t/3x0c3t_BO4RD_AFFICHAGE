@@ -18,13 +18,16 @@ void displayInit()
 
     tft.fillScreen(COLOR_BACKGROUND);
 
-    tft.setTextColor(COLOR_TEXT, COLOR_BACKGROUND);
+    tft.setTextColor(
+        COLOR_TEXT,
+        COLOR_BACKGROUND
+    );
 
     tft.setTextSize(1);
 }
 
 // ============================================================
-// ACCÈS TFT
+// ACCES TFT
 // ============================================================
 
 TFT_eSPI& displayGetTFT()
@@ -38,7 +41,9 @@ TFT_eSPI& displayGetTFT()
 
 void displayClear()
 {
-    tft.fillScreen(COLOR_BACKGROUND);
+    tft.fillScreen(
+        COLOR_BACKGROUND
+    );
 }
 
 // ============================================================
@@ -50,7 +55,7 @@ void displayDrawHeader()
     tft.fillRect(
         0,
         HEADER_Y,
-        TFT_WIDTH,
+        SCREEN_WIDTH,
         HEADER_H,
         COLOR_BACKGROUND
     );
@@ -67,12 +72,14 @@ void displayDrawHeader()
         9
     );
 
-    tft.print(BOARD_NAME);
+    tft.print(
+        "3x0c3t BO4RD"
+    );
 
     tft.drawFastHLine(
         0,
         LINE1_Y,
-        TFT_WIDTH,
+        SCREEN_WIDTH,
         COLOR_BORDER
     );
 }
@@ -81,7 +88,9 @@ void displayDrawHeader()
 // BARRE DE CHARGEMENT
 // ============================================================
 
-void displayDrawLoading(uint8_t percent)
+void displayDrawLoading(
+    uint8_t percent
+)
 {
     if (percent > 100)
     {
@@ -91,33 +100,38 @@ void displayDrawLoading(uint8_t percent)
     tft.drawRect(
         10,
         LOADING_Y,
-        TFT_WIDTH - 20,
+        SCREEN_WIDTH - 20,
         LOADING_H,
         COLOR_BORDER
     );
 
     uint16_t width =
-        ((TFT_WIDTH - 22) * percent) / 100;
+        ((SCREEN_WIDTH - 22) * percent) / 100;
 
-    tft.fillRect(
-        11,
-        LOADING_Y + 1,
-        width,
-        LOADING_H - 2,
-        COLOR_SELECTED
-    );
+    if (width > 0)
+    {
+        tft.fillRect(
+            11,
+            LOADING_Y + 1,
+            width,
+            LOADING_H - 2,
+            COLOR_SELECTED
+        );
+    }
 }
 
 // ============================================================
 // TITRE
 // ============================================================
 
-void displayDrawTitle(const char* title)
+void displayDrawTitle(
+    const char* title
+)
 {
     tft.fillRect(
         0,
         TITLE_Y,
-        TFT_WIDTH,
+        SCREEN_WIDTH,
         TITLE_H,
         COLOR_BACKGROUND
     );
@@ -139,13 +153,13 @@ void displayDrawTitle(const char* title)
     tft.drawFastHLine(
         0,
         LINE3_Y,
-        TFT_WIDTH,
+        SCREEN_WIDTH,
         COLOR_BORDER
     );
 }
 
 // ============================================================
-// RÉSULTAT BENCHMARK
+// RESULTAT BENCHMARK
 // ============================================================
 
 void displayDrawBenchmarkResult(
@@ -205,7 +219,7 @@ void displayDrawBenchmarkResult(
 
     tft.setCursor(
         BENCHMARK_X + 6,
-        y + 6
+        y + 7
     );
 
     switch (index)
@@ -236,8 +250,8 @@ void displayDrawBenchmarkResult(
     }
 
     tft.setCursor(
-        BENCHMARK_X + 130,
-        y + 6
+        BENCHMARK_X + 190,
+        y + 7
     );
 
     switch (status)
@@ -252,10 +266,14 @@ void displayDrawBenchmarkResult(
 
         case BENCHMARK_OK:
             tft.print(value);
+            tft.print(" ms");
             break;
 
         case BENCHMARK_ERROR:
             tft.print("ERROR");
+            break;
+
+        default:
             break;
     }
 }
