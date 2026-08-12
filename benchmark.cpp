@@ -1,283 +1,386 @@
 #include "benchmark.h"
-#include "display.h"
 #include "settings.h"
+#include "display.h"
 
-static void waitAndReturn()
+// ============================================================
+// NOMS
+// ============================================================
+
+static const char* benchmarkNames[BENCHMARK_COUNT] =
 {
+    "B1 - COULEURS",
+    "B2 - TEXTE",
+    "B3 - RECTANGLES",
+    "B4 - LIGNES",
+    "B5 - CERCLES",
+    "B6 - PIXELS"
+};
+
+// ============================================================
+// SELECTION
+// ============================================================
+
+static bool benchmarkSelected[BENCHMARK_COUNT] =
+{
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+};
+
+// ============================================================
+// ETAT
+// 0 = NON LANCE
+// 1 = EN COURS
+// 2 = VALIDE
+// 3 = ECHOUE
+// ============================================================
+
+static uint8_t benchmarkStatus[BENCHMARK_COUNT] =
+{
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+};
+
+// ============================================================
+// NOM
+// ============================================================
+
+const char* benchmarkGetName(uint8_t index)
+{
+    if (index >= BENCHMARK_COUNT)
+    {
+        return "";
+    }
+
+    return benchmarkNames[index];
+}
+
+// ============================================================
+// SELECTION
+// ============================================================
+
+bool benchmarkIsSelected(uint8_t index)
+{
+    if (index >= BENCHMARK_COUNT)
+    {
+        return false;
+    }
+
+    return benchmarkSelected[index];
+}
+
+// ============================================================
+// TOGGLE
+// ============================================================
+
+void benchmarkToggle(uint8_t index)
+{
+    if (index >= BENCHMARK_COUNT)
+    {
+        return;
+    }
+
+    benchmarkSelected[index] =
+        !benchmarkSelected[index];
+
+    // Une nouvelle sélection remet le statut à
+    // "non lancé"
+    benchmarkStatus[index] = 0;
+}
+
+// ============================================================
+// COULEUR ETAT
+// ============================================================
+
+uint16_t benchmarkGetStatusColor(uint8_t index)
+{
+    if (index >= BENCHMARK_COUNT)
+    {
+        return COLOR_STATUS_NONE;
+    }
+
+    switch (benchmarkStatus[index])
+    {
+        case 1:
+            return COLOR_STATUS_RUNNING;
+
+        case 2:
+            return COLOR_STATUS_OK;
+
+        case 3:
+            return COLOR_STATUS_ERROR;
+
+        default:
+            return COLOR_STATUS_NONE;
+    }
+}
+
+// ============================================================
+// B1 - COULEURS
+// ============================================================
+
+static bool runColors()
+{
+    Serial.println("[B1] COULEURS");
+
+    tft.fillScreen(TFT_RED);
+    delay(300);
+
+    tft.fillScreen(TFT_GREEN);
+    delay(300);
+
+    tft.fillScreen(TFT_BLUE);
+    delay(300);
+
+    tft.fillScreen(TFT_WHITE);
+    delay(300);
+
+    tft.fillScreen(TFT_BLACK);
+    delay(300);
+
+    return true;
+}
+
+// ============================================================
+// B2 - TEXTE
+// ============================================================
+
+static bool runText()
+{
+    Serial.println("[B2] TEXTE");
+
+    tft.fillScreen(TFT_BLACK);
+
+    tft.setTextColor(TFT_WHITE);
+    tft.setTextDatum(MC_DATUM);
+
+    tft.drawString(
+        "3x0c3t BO4RD",
+        SCREEN_WIDTH / 2,
+        SCREEN_HEIGHT / 2,
+        4
+    );
+
+    delay(1000);
+
+    return true;
+}
+
+// ============================================================
+// B3 - RECTANGLES
+// ============================================================
+
+static bool runRectangles()
+{
+    Serial.println("[B3] RECTANGLES");
+
+    tft.fillScreen(TFT_BLACK);
+
+    for (int i = 0; i < 100; i += 10)
+    {
+        tft.drawRect(
+            i,
+            i,
+            SCREEN_WIDTH - 2 * i,
+            SCREEN_HEIGHT - 2 * i,
+            TFT_WHITE
+        );
+
+        delay(20);
+    }
+
     delay(500);
 
-    tft.fillScreen(TFT_BLACK);
-
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.setTextDatum(MC_DATUM);
-
-    tft.drawString("TEST TERMINE", SCREEN_WIDTH / 2, 80, 2);
-    tft.drawString("Retour au menu...", SCREEN_WIDTH / 2, 120, 2);
-
-    tft.setTextDatum(TL_DATUM);
-
-    delay(1200);
+    return true;
 }
 
-void benchmarkColors()
+// ============================================================
+// B4 - LIGNES
+// ============================================================
+
+static bool runLines()
 {
-    displayTitle("BENCHMARK COULEURS");
-
-    const uint16_t colors[] =
-    {
-        TFT_BLACK,
-        TFT_WHITE,
-        TFT_RED,
-        TFT_GREEN,
-        TFT_BLUE,
-        TFT_YELLOW,
-        TFT_CYAN,
-        TFT_MAGENTA
-    };
-
-    const uint8_t count = sizeof(colors) / sizeof(colors[0]);
-
-    unsigned long start = millis();
-
-    for (uint8_t i = 0; i < count; i++)
-    {
-        tft.fillScreen(colors[i]);
-        delay(250);
-    }
-
-    unsigned long elapsed = millis() - start;
+    Serial.println("[B4] LIGNES");
 
     tft.fillScreen(TFT_BLACK);
 
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.setTextDatum(MC_DATUM);
-
-    tft.drawString("COULEURS", 120, 70, 2);
-
-    char buffer[32];
-
-    sprintf(buffer, "Temps : %lu ms", elapsed);
-    tft.drawString(buffer, 120, 120, 2);
-
-    sprintf(buffer, "Tests  : %u", count);
-    tft.drawString(buffer, 120, 150, 2);
-
-    tft.setTextDatum(TL_DATUM);
-
-    waitAndReturn();
-}
-
-void benchmarkLines()
-{
-    displayTitle("BENCHMARK LIGNES");
-
-    unsigned long start = millis();
-
-    for (int y = 0; y < SCREEN_HEIGHT; y += 4)
+    for (int x = 0; x < SCREEN_WIDTH; x += 5)
     {
-        tft.drawLine(0, y, SCREEN_WIDTH - 1, SCREEN_HEIGHT - y - 1, TFT_GREEN);
-    }
-
-    for (int x = 0; x < SCREEN_WIDTH; x += 4)
-    {
-        tft.drawLine(x, 0, SCREEN_WIDTH - x - 1, SCREEN_HEIGHT - 1, TFT_CYAN);
-    }
-
-    unsigned long elapsed = millis() - start;
-
-    tft.fillRect(20, 130, 200, 60, TFT_BLACK);
-
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.setTextDatum(MC_DATUM);
-
-    char buffer[32];
-
-    sprintf(buffer, "Temps : %lu ms", elapsed);
-    tft.drawString(buffer, 120, 145, 2);
-
-    sprintf(buffer, "FPS : %lu", elapsed ? 1000UL / elapsed : 0);
-    tft.drawString(buffer, 120, 175, 2);
-
-    tft.setTextDatum(TL_DATUM);
-
-    waitAndReturn();
-}
-
-void benchmarkRectangles()
-{
-    displayTitle("BENCHMARK RECTANGLES");
-
-    unsigned long start = millis();
-
-    for (int i = 0; i < 80; i++)
-    {
-        int x = i % 120;
-        int y = (i * 3) % 160;
-        int w = 20 + (i % 60);
-        int h = 15 + (i % 50);
-
-        tft.drawRect(x, y + 60, w, h, TFT_YELLOW);
-    }
-
-    for (int i = 0; i < 30; i++)
-    {
-        int x = i % 100;
-        int y = (i * 5) % 150;
-
-        tft.fillRect(
+        tft.drawLine(
+            0,
+            0,
             x,
-            y + 60,
-            15 + i,
-            10 + (i % 20),
+            SCREEN_HEIGHT,
+            TFT_GREEN
+        );
+    }
+
+    for (int y = 0; y < SCREEN_HEIGHT; y += 5)
+    {
+        tft.drawLine(
+            0,
+            0,
+            SCREEN_WIDTH,
+            y,
             TFT_BLUE
         );
     }
 
-    unsigned long elapsed = millis() - start;
+    delay(500);
 
-    tft.fillRect(20, 270, 200, 35, TFT_BLACK);
-
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.setTextDatum(MC_DATUM);
-
-    char buffer[32];
-
-    sprintf(buffer, "%lu ms", elapsed);
-    tft.drawString(buffer, 120, 285, 2);
-
-    tft.setTextDatum(TL_DATUM);
-
-    waitAndReturn();
+    return true;
 }
 
-void benchmarkCircles()
-{
-    displayTitle("BENCHMARK CERCLES");
+// ============================================================
+// B5 - CERCLES
+// ============================================================
 
-    unsigned long start = millis();
+static bool runCircles()
+{
+    Serial.println("[B5] CERCLES");
+
+    tft.fillScreen(TFT_BLACK);
+
+    int cx = SCREEN_WIDTH / 2;
+    int cy = SCREEN_HEIGHT / 2;
 
     for (int r = 5; r < 110; r += 5)
     {
         tft.drawCircle(
-            SCREEN_WIDTH / 2,
-            185,
+            cx,
+            cy,
             r,
             TFT_CYAN
         );
     }
 
-    unsigned long elapsed = millis() - start;
+    delay(500);
 
-    tft.fillRect(20, 65, 200, 35, TFT_BLACK);
-
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.setTextDatum(MC_DATUM);
-
-    char buffer[32];
-
-    sprintf(buffer, "Temps : %lu ms", elapsed);
-    tft.drawString(buffer, 120, 82, 2);
-
-    tft.setTextDatum(TL_DATUM);
-
-    waitAndReturn();
+    return true;
 }
 
-void benchmarkPixels()
+// ============================================================
+// B6 - PIXELS
+// ============================================================
+
+static bool runPixels()
 {
-    displayTitle("BENCHMARK PIXELS");
+    Serial.println("[B6] PIXELS");
 
-    unsigned long start = millis();
+    tft.fillScreen(TFT_BLACK);
 
-    for (int y = 60; y < SCREEN_HEIGHT; y++)
+    for (int y = 0; y < SCREEN_HEIGHT; y += 4)
     {
-        for (int x = 0; x < SCREEN_WIDTH; x++)
+        for (int x = 0; x < SCREEN_WIDTH; x += 4)
         {
-            uint16_t color =
-                tft.color565(
-                    x % 256,
-                    y % 256,
-                    (x + y) % 256
-                );
-
-            tft.drawPixel(x, y, color);
+            tft.drawPixel(
+                x,
+                y,
+                TFT_WHITE
+            );
         }
     }
 
-    unsigned long elapsed = millis() - start;
+    delay(500);
 
-    tft.fillRect(20, 130, 200, 60, TFT_BLACK);
-
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.setTextDatum(MC_DATUM);
-
-    char buffer[32];
-
-    sprintf(buffer, "Temps : %lu ms", elapsed);
-    tft.drawString(buffer, 120, 145, 2);
-
-    sprintf(
-        buffer,
-        "Pixels : %lu",
-        (unsigned long)SCREEN_WIDTH * (SCREEN_HEIGHT - 60)
-    );
-
-    tft.drawString(buffer, 120, 175, 2);
-
-    tft.setTextDatum(TL_DATUM);
-
-    waitAndReturn();
+    return true;
 }
 
-void benchmarkText()
+// ============================================================
+// EXECUTION D'UN BENCHMARK
+// ============================================================
+
+static bool runBenchmark(uint8_t index)
 {
-    displayTitle("BENCHMARK TEXTE");
-
-    unsigned long start = millis();
-
-    for (int i = 0; i < 100; i++)
+    switch (index)
     {
-        tft.setTextColor(
-            tft.color565(
-                (i * 2) % 255,
-                (i * 3) % 255,
-                (i * 5) % 255
-            ),
-            TFT_BLACK
+        case 0:
+            return runColors();
+
+        case 1:
+            return runText();
+
+        case 2:
+            return runRectangles();
+
+        case 3:
+            return runLines();
+
+        case 4:
+            return runCircles();
+
+        case 5:
+            return runPixels();
+
+        default:
+            return false;
+    }
+}
+
+// ============================================================
+// LANCEMENT DES BENCHMARKS SELECTIONNES
+// ============================================================
+
+void benchmarkRunSelected()
+{
+    bool atLeastOne = false;
+
+    for (uint8_t i = 0; i < BENCHMARK_COUNT; i++)
+    {
+        if (!benchmarkSelected[i])
+        {
+            continue;
+        }
+
+        atLeastOne = true;
+
+        benchmarkStatus[i] = 1;
+
+        Serial.print("[BENCH] START ");
+        Serial.println(
+            benchmarkGetName(i)
         );
 
-        tft.drawString(
-            "3x0c3t BO4RD",
-            20 + (i % 5) * 5,
-            65 + (i % 20) * 10,
-            2
+        bool result =
+            runBenchmark(i);
+
+        benchmarkStatus[i] =
+            result ? 2 : 3;
+
+        Serial.print("[BENCH] ");
+        Serial.print(
+            benchmarkGetName(i)
+        );
+
+        Serial.println(
+            result
+            ? " -> VALIDE"
+            : " -> ECHOUE"
         );
     }
 
-    unsigned long elapsed = millis() - start;
+    if (!atLeastOne)
+    {
+        Serial.println(
+            "[BENCH] Aucun benchmark selectionne"
+        );
 
-    tft.fillRect(20, 270, 200, 35, TFT_BLACK);
+        tft.fillScreen(COLOR_BACKGROUND);
 
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.setTextDatum(MC_DATUM);
+        drawHeader1();
+        drawHeader2();
 
-    char buffer[32];
+        drawStatus(
+            "Aucun benchmark selectionne"
+        );
 
-    sprintf(buffer, "%lu ms", elapsed);
-    tft.drawString(buffer, 120, 285, 2);
-
-    tft.setTextDatum(TL_DATUM);
-
-    waitAndReturn();
+        delay(1200);
+    }
 }
-
-void benchmarkAll()
-{
-    benchmarkColors();
-    benchmarkLines();
-    benchmarkRectangles();
-    benchmarkCircles();
-    benchmarkPixels();
-    benchmarkText();
-}
-

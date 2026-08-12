@@ -1,12 +1,18 @@
 #ifndef BENCHMARK_H
 #define BENCHMARK_H
 
-void benchmarkColors();
-void benchmarkLines();
-void benchmarkRectangles();
-void benchmarkCircles();
-void benchmarkPixels();
-void benchmarkText();
-void benchmarkAll();
+#include <Arduino.h>
+
+#define BENCHMARK_COUNT 6
+
+const char* benchmarkGetName(uint8_t index);
+
+bool benchmarkIsSelected(uint8_t index);
+
+void benchmarkToggle(uint8_t index);
+
+uint16_t benchmarkGetStatusColor(uint8_t index);
+
+void benchmarkRunSelected();
 
 #endif
