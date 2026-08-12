@@ -1,13 +1,21 @@
-#ifndef AFFICHAGE_TOUCH_H
-#define AFFICHAGE_TOUCH_H
+#ifndef TOUCH_MODULE_H
+#define TOUCH_MODULE_H
 
 #include <Arduino.h>
 
+// ============================================================
+// INITIALISATION
+// ============================================================
+
 void touchInit();
 
-bool touchPressed(
-    uint16_t& x,
-    uint16_t& y
+// ============================================================
+// LECTURE TACTILE
+// ============================================================
+
+bool touchRead(
+int16_t& x,
+int16_t& y
 );
 
 #endif

@@ -7,7 +7,7 @@
 // OBJET TFT / TOUCH
 // ============================================================
 
-static TFT_eSPI touchTFT;
+static TFT_eSPI touchTft = TFT_eSPI();
 
 // ============================================================
 // INITIALISATION
@@ -15,35 +15,48 @@ static TFT_eSPI touchTFT;
 
 void touchInit()
 {
-    touchTFT.init();
+pinMode(
+TOUCH_CS,
+OUTPUT
+);
 
-    touchTFT.setRotation(
-        TFT_ROTATION
-    );
+digitalWrite(
+    TOUCH_CS,
+    HIGH
+);
+
+pinMode(
+    TOUCH_IRQ_PIN,
+    INPUT_PULLUP
+);
+
 }
 
 // ============================================================
-// LECTURE TACTILE
+// LECTURE
 // ============================================================
 
-bool touchPressed(
-    uint16_t& x,
-    uint16_t& y
+bool touchRead(
+int16_t& x,
+int16_t& y
 )
 {
-    uint16_t tx = 0;
-    uint16_t ty = 0;
+uint16_t rawX = 0;
+uint16_t rawY = 0;
 
-    if (!touchTFT.getTouch(
-        &tx,
-        &ty
-    ))
-    {
-        return false;
-    }
 
-    x = tx;
-    y = ty;
+if (!touchTft.getTouch(
+    &rawX,
+    &rawY
+))
+{
+    return false;
+}
 
-    return true;
+x = (int16_t)rawX;
+y = (int16_t)rawY;
+
+return true;
+
+
 }

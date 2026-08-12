@@ -1,5 +1,5 @@
-#ifndef AFFICHAGE_DISPLAY_H
-#define AFFICHAGE_DISPLAY_H
+#ifndef DISPLAY_MODULE_H
+#define DISPLAY_MODULE_H
 
 #include <Arduino.h>
 #include <TFT_eSPI.h>
@@ -22,11 +22,23 @@ TFT_eSPI& displayGetTFT();
 // AFFICHAGE
 // ============================================================
 
-void displayDrawMenu();
+void displayClear();
+
+void displayDrawHeader();
+
+// ============================================================
+// BENCHMARK
+// ============================================================
+
+void displayDrawBenchmarkRunning(
+uint8_t index
+);
 
 void displayDrawBenchmarkResult(
-    uint8_t index,
-    BenchmarkStatus status
+uint8_t index,
+BenchmarkStatus status
 );
+
+void displayDrawBenchmarkFinished();
 
 #endif

@@ -1,17 +1,208 @@
 #include "menu.h"
-
 #include "settings.h"
 #include "display.h"
 #include "touch.h"
 #include "benchmark.h"
 
 // ============================================================
-// ANTI DOUBLE-TOUCH
+// ETAT LOCAL
 // ============================================================
 
-static unsigned long lastTouch = 0;
+static bool menuSelected[BENCHMARK_COUNT];
 
-#define TOUCH_DEBOUNCE 250
+// ============================================================
+// COULEUR DU STATUT
+// ============================================================
+
+static uint16_t statusColor(
+BenchmarkStatus status
+)
+{
+switch (status)
+{
+case BENCHMARK_RUNNING:
+return COLOR_RUNNING;
+
+    case BENCHMARK_OK:
+        return COLOR_OK;
+
+    case BENCHMARK_ERROR:
+        return COLOR_ERROR;
+
+    case BENCHMARK_IDLE:
+    default:
+        return COLOR_IDLE;
+}
+
+}
+
+// ============================================================
+// POSITION Y D'UN BENCHMARK
+// ============================================================
+
+static int benchmarkY(
+uint8_t index
+)
+{
+return
+HEADER1_H +
+HEADER2_H +
+8 +
+index *
+(
+BENCHMARK_BUTTON_H +
+BENCHMARK_BUTTON_GAP
+);
+}
+
+// ============================================================
+// DESSIN D'UN BENCHMARK
+// ============================================================
+
+static void drawBenchmarkButton(
+uint8_t index
+)
+{
+TFT_eSPI& tft =
+displayGetTFT();
+
+const int y =
+    benchmarkY(index);
+
+const bool selected =
+    benchmarkIsSelected(index);
+
+const BenchmarkStatus status =
+    benchmarkGetStatus(index);
+
+uint16_t background =
+    selected
+    ? COLOR_SELECTED
+    : COLOR_BACKGROUND;
+
+tft.fillRoundRect(
+    BENCHMARK_BUTTON_X,
+    y,
+    BENCHMARK_BUTTON_W,
+    BENCHMARK_BUTTON_H,
+    4,
+    background
+);
+
+tft.drawRoundRect(
+    BENCHMARK_BUTTON_X,
+    y,
+    BENCHMARK_BUTTON_W,
+    BENCHMARK_BUTTON_H,
+    4,
+    COLOR_BORDER
+);
+
+tft.setTextColor(
+    COLOR_TEXT
+);
+
+tft.setTextSize(1);
+
+tft.setCursor(
+    12,
+    y + 10
+);
+
+tft.print("B");
+tft.print(index + 1);
+tft.print(" - ");
+tft.print(
+    benchmarkName(index)
+);
+
+// --------------------------------------------------------
+// INDICATEUR SELECTION
+// --------------------------------------------------------
+
+tft.fillRect(
+    145,
+    y + 8,
+    12,
+    12,
+    selected
+    ? COLOR_OK
+    : COLOR_IDLE
+);
+
+tft.drawRect(
+    145,
+    y + 8,
+    12,
+    12,
+    COLOR_TEXT
+);
+
+// --------------------------------------------------------
+// INDICATEUR STATUT
+// --------------------------------------------------------
+
+tft.fillRect(
+    170,
+    y + 8,
+    12,
+    12,
+    statusColor(status)
+);
+
+tft.drawRect(
+    170,
+    y + 8,
+    12,
+    12,
+    COLOR_TEXT
+);
+
+}
+
+// ============================================================
+// DESSIN BOUTON RUN
+// ============================================================
+
+static void drawRunButton()
+{
+TFT_eSPI& tft =
+displayGetTFT();
+
+tft.fillRoundRect(
+    BUTTON_RUN_X,
+    RUN_BUTTON_Y,
+    BUTTON_RUN_W,
+    BUTTON_RUN_H,
+    5,
+    0x0320
+);
+
+tft.drawRoundRect(
+    BUTTON_RUN_X,
+    RUN_BUTTON_Y,
+    BUTTON_RUN_W,
+    BUTTON_RUN_H,
+    5,
+    COLOR_TEXT
+);
+
+tft.setTextColor(
+    COLOR_TEXT
+);
+
+tft.setTextSize(2);
+
+tft.setCursor(
+    105,
+    RUN_BUTTON_Y + 7
+);
+
+tft.print(
+    "LANCER !"
+);
+
+}
 
 // ============================================================
 // INITIALISATION
@@ -19,151 +210,100 @@ static unsigned long lastTouch = 0;
 
 void menuInit()
 {
-    benchmarkInit();
+benchmarkInit();
 
-    displayDrawMenu();
-}
-
-// ============================================================
-// RECHERCHE BENCHMARK
-// ============================================================
-
-static int8_t getBenchmarkAt(
-    uint16_t x,
-    uint16_t y
+for (
+    uint8_t i = 0;
+    i < BENCHMARK_COUNT;
+    i++
 )
 {
-    if (
-        x < BENCHMARK_BUTTON_X ||
-        x > BENCHMARK_BUTTON_X +
-            BENCHMARK_BUTTON_W
-    )
-    {
-        return -1;
-    }
-
-    for (uint8_t i = 0;
-         i < BENCHMARK_COUNT;
-         i++)
-    {
-        uint16_t by =
-            BENCHMARK_FIRST_Y +
-            i *
-            (
-                BENCHMARK_H +
-                BENCHMARK_GAP
-            );
-
-        if (
-            y >= by &&
-            y < by + BENCHMARK_H
-        )
-        {
-            return i;
-        }
-    }
-
-    return -1;
+    menuSelected[i] = false;
 }
 
-// ============================================================
-// BOUTON LANCER
-// ============================================================
+displayDrawHeader();
 
-static bool isRunButton(
-    uint16_t x,
-    uint16_t y
+for (
+    uint8_t i = 0;
+    i < BENCHMARK_COUNT;
+    i++
 )
 {
-    return
-        x >= RUN_BUTTON_X &&
-        x <= RUN_BUTTON_X +
-             RUN_BUTTON_W &&
-        y >= RUN_BUTTON_Y &&
-        y <= RUN_BUTTON_Y +
-             RUN_BUTTON_H;
+    drawBenchmarkButton(i);
+}
+
+drawRunButton();
+
 }
 
 // ============================================================
-// LOOP MENU
+// BOUCLE
 // ============================================================
 
 void menuLoop()
 {
-    uint16_t x;
-    uint16_t y;
+int16_t x = 0;
+int16_t y = 0;
 
-    if (!touchPressed(
-        x,
-        y
-    ))
-    {
-        return;
-    }
 
-    unsigned long now =
-        millis();
+if (!touchRead(x, y))
+{
+    return;
+}
+
+// --------------------------------------------------------
+// BOUTONS BENCHMARK
+// --------------------------------------------------------
+
+for (
+    uint8_t i = 0;
+    i < BENCHMARK_COUNT;
+    i++
+)
+{
+    const int buttonY =
+        benchmarkY(i);
 
     if (
-        now - lastTouch <
-        TOUCH_DEBOUNCE
+        x >= BENCHMARK_BUTTON_X &&
+        x < BENCHMARK_BUTTON_X +
+            BENCHMARK_BUTTON_W &&
+        y >= buttonY &&
+        y < buttonY +
+            BENCHMARK_BUTTON_H
     )
     {
-        return;
-    }
+        benchmarkToggle(i);
 
-    lastTouch = now;
+        menuSelected[i] =
+            benchmarkIsSelected(i);
 
-    Serial.print(
-        "[TOUCH] X="
-    );
+        drawBenchmarkButton(i);
 
-    Serial.print(x);
-
-    Serial.print(
-        " Y="
-    );
-
-    Serial.println(y);
-
-    // --------------------------------------------------------
-    // BENCHMARK
-    // --------------------------------------------------------
-
-    int8_t benchmark =
-        getBenchmarkAt(
-            x,
-            y
-        );
-
-    if (benchmark >= 0)
-    {
-        benchmarkToggle(
-            (uint8_t)benchmark
-        );
-
-        displayDrawMenu();
+        delay(250);
 
         return;
     }
+}
 
-    // --------------------------------------------------------
-    // LANCER
-    // --------------------------------------------------------
+// --------------------------------------------------------
+// BOUTON LANCER
+// --------------------------------------------------------
 
-    if (isRunButton(
-        x,
-        y
-    ))
-    {
-        Serial.println(
-            "[BENCH] Lancement"
-        );
+if (
+    x >= RUN_BUTTON_X &&
+    x < RUN_BUTTON_X +
+        RUN_BUTTON_W &&
+    y >= RUN_BUTTON_Y &&
+    y < RUN_BUTTON_Y +
+        RUN_BUTTON_H
+)
+{
+    benchmarkRunSelected();
 
-        benchmarkRunSelected();
+    menuInit();
 
-        displayDrawMenu();
+    delay(300);
+}
 
-        return;
-    }
 }
