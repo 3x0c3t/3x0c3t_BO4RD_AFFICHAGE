@@ -1,65 +1,67 @@
-#ifndef BENCHMARK_MODULE_H
-#define BENCHMARK_MODULE_H
+#ifndef BENCHMARK_H
+#define BENCHMARK_H
 
 #include <Arduino.h>
 
-// ============================================================
-// ETAT DES BENCHMARKS
-// ============================================================
+/*
+ * ============================================================
+ * 3x0c3t BO4RD - BENCHMARK
+ * ============================================================
+ */
 
 enum BenchmarkStatus
 {
-BENCHMARK_IDLE = 0,
-BENCHMARK_RUNNING,
-BENCHMARK_OK,
-BENCHMARK_ERROR
+    BENCHMARK_IDLE = 0,
+    BENCHMARK_RUNNING,
+    BENCHMARK_OK,
+    BENCHMARK_ERROR
 };
 
-// ============================================================
-// INITIALISATION
-// ============================================================
+/*
+ * ------------------------------------------------------------
+ * INITIALISATION
+ * ------------------------------------------------------------
+ */
 
 void benchmarkInit();
 
-// ============================================================
-// INFORMATIONS
-// ============================================================
+/*
+ * ------------------------------------------------------------
+ * INFORMATIONS
+ * ------------------------------------------------------------
+ */
 
 uint8_t benchmarkCount();
 
-const char* benchmarkName(
-uint8_t index
-);
+const char* benchmarkName(uint8_t index);
 
-bool benchmarkIsSelected(
-uint8_t index
-);
+BenchmarkStatus benchmarkGetStatus(uint8_t index);
 
-BenchmarkStatus benchmarkGetStatus(
-uint8_t index
-);
+bool benchmarkIsSelected(uint8_t index);
 
-// ============================================================
-// SELECTION
-// ============================================================
+/*
+ * ------------------------------------------------------------
+ * SÉLECTION
+ * ------------------------------------------------------------
+ */
 
-void benchmarkToggle(
-uint8_t index
-);
-
-void benchmarkSelectAll();
+void benchmarkToggle(uint8_t index);
 
 void benchmarkClearAll();
 
-// ============================================================
-// EXECUTION
-// ============================================================
+/*
+ * ------------------------------------------------------------
+ * EXÉCUTION
+ * ------------------------------------------------------------
+ */
 
 void benchmarkRunSelected();
 
-// ============================================================
-// BENCHMARKS
-// ============================================================
+/*
+ * ------------------------------------------------------------
+ * BENCHMARKS INDIVIDUELS
+ * ------------------------------------------------------------
+ */
 
 void benchmarkColors();
 

@@ -3,60 +3,61 @@
 
 #include <TFT_eSPI.h>
 
-// ============================================================
-// OBJET TFT / TOUCH
-// ============================================================
+/*
+ * ============================================================
+ * 3x0c3t BO4RD - TOUCH
+ * ============================================================
+ *
+ * TFT_eSPI gère le contrôleur tactile via sa configuration
+ * User_Setup.h.
+ * ============================================================
+ */
 
-static TFT_eSPI touchTft = TFT_eSPI();
+static TFT_eSPI tft = TFT_eSPI();
 
-// ============================================================
-// INITIALISATION
-// ============================================================
+/*
+ * ============================================================
+ * INITIALISATION
+ * ============================================================
+ */
 
 void touchInit()
 {
-pinMode(
-TOUCH_CS,
-OUTPUT
-);
-
-digitalWrite(
-    TOUCH_CS,
-    HIGH
-);
-
-pinMode(
-    TOUCH_IRQ_PIN,
-    INPUT_PULLUP
-);
-
+    /*
+     * TFT_eSPI initialise le tactile avec init().
+     * On ne redéfinit pas TOUCH_CS ici.
+     */
 }
 
-// ============================================================
-// LECTURE
-// ============================================================
+/*
+ * ============================================================
+ * LECTURE
+ * ============================================================
+ */
 
 bool touchRead(
-int16_t& x,
-int16_t& y
+    uint16_t* x,
+    uint16_t* y
 )
 {
-uint16_t rawX = 0;
-uint16_t rawY = 0;
+    if (x == nullptr || y == nullptr)
+    {
+        return false;
+    }
 
+    uint16_t tx;
+    uint16_t ty;
 
-if (!touchTft.getTouch(
-    &rawX,
-    &rawY
-))
-{
-    return false;
-}
+    if (!tft.getTouch(
+        &tx,
+        &ty
+    ))
+    {
+        return false;
+    }
 
-x = (int16_t)rawX;
-y = (int16_t)rawY;
+    *x = tx;
+    *y = ty;
 
-return true;
-
-
+    return true;
 }

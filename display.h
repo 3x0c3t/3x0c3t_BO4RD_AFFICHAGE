@@ -1,44 +1,29 @@
-#ifndef DISPLAY_MODULE_H
-#define DISPLAY_MODULE_H
+#ifndef DISPLAY_H
+#define DISPLAY_H
 
 #include <Arduino.h>
 #include <TFT_eSPI.h>
 
+#include "settings.h"
 #include "benchmark.h"
 
-// ============================================================
-// INITIALISATION
-// ============================================================
+/*
+ * ============================================================
+ * 3x0c3t BO4RD - DISPLAY
+ * ============================================================
+ */
 
 void displayInit();
-
-// ============================================================
-// ACCES TFT
-// ============================================================
-
-TFT_eSPI& displayGetTFT();
-
-// ============================================================
-// AFFICHAGE
-// ============================================================
 
 void displayClear();
 
 void displayDrawHeader();
 
-// ============================================================
-// BENCHMARK
-// ============================================================
-
-void displayDrawBenchmarkRunning(
-uint8_t index
-);
-
 void displayDrawBenchmarkResult(
-uint8_t index,
-BenchmarkStatus status
+    uint8_t index,
+    BenchmarkStatus status
 );
 
-void displayDrawBenchmarkFinished();
+TFT_eSPI* displayGetTFT();
 
 #endif

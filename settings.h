@@ -3,91 +3,122 @@
 
 #include <Arduino.h>
 
-// ============================================================
-// 3x0c3t BO4RD - AFFICHAGE
-// ESP8266 NodeMCU
-// TFT ILI9341 240x320
-// XPT2046
-// ============================================================
+/*
+ * ============================================================
+ * 3x0c3t BO4RD - AFFICHAGE
+ * Configuration générale
+ * ============================================================
+ */
 
-// ============================================================
-// ECRAN
-// ============================================================
+/*
+ * ------------------------------------------------------------
+ * ÉCRAN
+ * ------------------------------------------------------------
+ */
 
-#define SCREEN_WIDTH    320
-#define SCREEN_HEIGHT   240
+#define SCREEN_WIDTH   240
+#define SCREEN_HEIGHT  320
 
-#define TFT_ROTATION    2
+#define TFT_ROTATION   0
 
-// ============================================================
-// TOUCH
-// ============================================================
+/*
+ * ------------------------------------------------------------
+ * COULEURS
+ * ------------------------------------------------------------
+ */
 
-#define TOUCH_IRQ_PIN   5
+#define COLOR_BACKGROUND   0x0000
+#define COLOR_TEXT         0xFFFF
 
-// IMPORTANT
-// TOUCH_CS est défini par TFT_eSPI/User_Setup.h
-// Ne pas le redéfinir ici.
+#define COLOR_HEADER1      0x001F
+#define COLOR_HEADER2      0x07E0
 
-// ============================================================
-// INTERFACE
-// ============================================================
+#define COLOR_BORDER       0xFFFF
+#define COLOR_SELECTED     0x07FF
 
-#define HEADER1_H       28
-#define HEADER2_H       24
+#define COLOR_OK           0x07E0
+#define COLOR_ERROR        0xF800
+#define COLOR_WARNING      0xFFE0
+#define COLOR_RUNNING      0x001F
 
-#define FOOTER_H        28
+/*
+ * ------------------------------------------------------------
+ * HEADER
+ * ------------------------------------------------------------
+ */
 
-#define SCREEN_MARGIN   5
+#define HEADER1_Y          0
+#define HEADER1_H          28
 
-// ============================================================
-// BENCHMARKS
-// ============================================================
+#define HEADER2_Y          28
+#define HEADER2_H          28
 
-#define BENCHMARK_COUNT         5
+#define HEADER_TITLE_Y     35
 
-#define BENCHMARK_BUTTON_X      5
-#define BENCHMARK_BUTTON_W      (SCREEN_WIDTH - 10)
-#define BENCHMARK_BUTTON_H      28
-#define BENCHMARK_BUTTON_GAP    4
+/*
+ * ------------------------------------------------------------
+ * ZONE CONTENU
+ * ------------------------------------------------------------
+ */
 
-#define BENCHMARK_H             BENCHMARK_BUTTON_H
-#define BENCHMARK_GAP           BENCHMARK_BUTTON_GAP
+#define CONTENT_Y          60
+#define CONTENT_H          200
 
-// ============================================================
-// BOUTON RUN
-// ============================================================
+/*
+ * ------------------------------------------------------------
+ * BENCHMARKS
+ * ------------------------------------------------------------
+ */
 
-#define BUTTON_RUN_X            5
-#define BUTTON_RUN_W            (SCREEN_WIDTH - 10)
-#define BUTTON_RUN_H            30
+#define BENCHMARK_BUTTON_X       10
+#define BENCHMARK_BUTTON_Y       70
+#define BENCHMARK_BUTTON_W       220
+#define BENCHMARK_BUTTON_H       30
 
-#define RUN_BUTTON_X            BUTTON_RUN_X
-#define RUN_BUTTON_W            BUTTON_RUN_W
-#define RUN_BUTTON_H            BUTTON_RUN_H
+#define BENCHMARK_H              30
+#define BENCHMARK_GAP            5
 
-#define RUN_BUTTON_Y 
-(HEADER1_H + HEADER2_H + 8 + 
-BENCHMARK_COUNT * 
-(BENCHMARK_BUTTON_H + BENCHMARK_BUTTON_GAP) + 5)
+#define BENCHMARK_FIRST_Y        70
 
-// ============================================================
-// COULEURS
-// ============================================================
+#define BENCHMARK_COUNT          5
 
-#define COLOR_BACKGROUND    0x0000
-#define COLOR_HEADER1       0x001F
-#define COLOR_HEADER2       0x7BEF
+/*
+ * ------------------------------------------------------------
+ * BOUTON RUN
+ * ------------------------------------------------------------
+ */
 
-#define COLOR_TEXT          0xFFFF
+#define RUN_BUTTON_X             10
+#define RUN_BUTTON_Y             260
+#define RUN_BUTTON_W             220
+#define RUN_BUTTON_H             40
 
-#define COLOR_SELECTED      0x001F
-#define COLOR_BORDER        0xC618
+#define BUTTON_RUN_X             RUN_BUTTON_X
+#define BUTTON_RUN_Y             RUN_BUTTON_Y
+#define BUTTON_RUN_W             RUN_BUTTON_W
+#define BUTTON_RUN_H             RUN_BUTTON_H
 
-#define COLOR_IDLE          0x7BEF
-#define COLOR_RUNNING       0xFFE0
-#define COLOR_OK            0x07E0
-#define COLOR_ERROR         0xF800
-#define COLOR_WARNING       0xFD20
+/*
+ * ------------------------------------------------------------
+ * TOUCH
+ *
+ * IMPORTANT :
+ * Ne pas définir TFT_CS / TFT_DC / TFT_RST ici.
+ *
+ * TFT_eSPI possède déjà sa propre configuration dans
+ * User_Setup.h.
+ * ------------------------------------------------------------
+ */
+
+#define TOUCH_CS_PIN             0
+#define TOUCH_IRQ_PIN            5
+
+/*
+ * ------------------------------------------------------------
+ * DEBUG
+ * ------------------------------------------------------------
+ */
+
+#define DEBUG_SERIAL_BAUD        115200
 
 #endif
