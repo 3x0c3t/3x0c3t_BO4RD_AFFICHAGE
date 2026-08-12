@@ -1,16 +1,9 @@
 #include "touch.h"
 #include "settings.h"
-#include "menu.h"
 
 #include <TFT_eSPI.h>
 
-extern TFT_eSPI tft;
-
-// ============================================================
-// ETAT TOUCH
-// ============================================================
-
-static bool touchWasPressed = false;
+static TFT_eSPI touchTft = TFT_eSPI();
 
 // ============================================================
 // INITIALISATION
@@ -18,49 +11,36 @@ static bool touchWasPressed = false;
 
 void touchInit()
 {
-    Serial.println("[TOUCH] Initialisation...");
+    pinMode(TOUCH_CS, OUTPUT);
 
-    touchWasPressed = false;
-
-    Serial.println("[TOUCH] OK");
+    digitalWrite(
+        TOUCH_CS,
+        HIGH
+    );
 }
 
 // ============================================================
-// LECTURE TOUCH
+// LECTURE
 // ============================================================
 
-void touchUpdate()
+bool touchRead(
+    int16_t& x,
+    int16_t& y
+)
 {
-    uint16_t x = 0;
-    uint16_t y = 0;
+    uint16_t rawX = 0;
+    uint16_t rawY = 0;
 
-    bool pressed = tft.getTouch(
-        &x,
-        &y
-    );
-
-    // Détection uniquement au début de l'appui
-    if (pressed && !touchWasPressed)
+    if (!touchTft.getTouch(
+        &rawX,
+        &rawY
+    ))
     {
-        touchWasPressed = true;
-
-        Serial.print("[TOUCH] X=");
-        Serial.print(x);
-
-        Serial.print(" Y=");
-        Serial.println(y);
-
-        menuHandleTouch(
-            x,
-            y
-        );
+        return false;
     }
 
-    // Relâchement
-    if (!pressed)
-    {
-        touchWasPressed = false;
-    }
+    x = rawX;
+    y = rawY;
 
-    delay(10);
+    return true;
 }

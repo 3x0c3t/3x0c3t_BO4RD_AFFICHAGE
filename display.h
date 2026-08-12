@@ -1,29 +1,26 @@
-#ifndef DISPLAY_H
-#define DISPLAY_H
+#ifndef DISPLAY_MODULE_H
+#define DISPLAY_MODULE_H
 
 #include <Arduino.h>
 #include <TFT_eSPI.h>
 
-extern TFT_eSPI tft;
-
 void displayInit();
 
-void displayClear(uint16_t color);
+TFT_eSPI& displayGetTFT();
 
-void drawHeader1();
-void drawHeader2();
+void displayClear();
 
-void drawInterface();
+void displayDrawHeader();
 
-void drawBenchmarkButton(
-    uint8_t index,
-    const char* label,
-    bool selected,
-    uint16_t statusColor
+void displayDrawBenchmarkRunning(
+    uint8_t index
 );
 
-void drawRunButton();
+void displayDrawBenchmarkResult(
+    uint8_t index,
+    uint8_t status
+);
 
-void drawStatus(const char* text);
+void displayDrawBenchmarkFinished();
 
 #endif

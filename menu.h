@@ -1,13 +1,10 @@
-#ifndef MENU_H
-#define MENU_H
+#ifndef MENU_MODULE_H
+#define MENU_MODULE_H
 
 #include <Arduino.h>
 
 void menuInit();
 
-void menuHandleTouch(
-    uint16_t x,
-    uint16_t y
-);
+void menuLoop();
 
 #endif

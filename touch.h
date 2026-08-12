@@ -1,9 +1,13 @@
-#ifndef TOUCH_H
-#define TOUCH_H
+#ifndef TOUCH_MODULE_H
+#define TOUCH_MODULE_H
 
 #include <Arduino.h>
 
 void touchInit();
-void touchUpdate();
+
+bool touchRead(
+    int16_t& x,
+    int16_t& y
+);
 
 #endif

@@ -2,30 +2,39 @@
 #include "display.h"
 #include "touch.h"
 #include "menu.h"
-#include "benchmark.h"
 
 void setup()
 {
-    Serial.begin(SERIAL_BAUDRATE);
-    delay(300);
+    Serial.begin(115200);
+
+    delay(500);
 
     Serial.println();
-    Serial.println("================================");
-    Serial.println("       3x0c3t BO4RD");
-    Serial.println("       AFFICHAGE / BENCHMARK");
-    Serial.println("================================");
+    Serial.println("==============================");
+    Serial.println("   3x0c3t BO4RD");
+    Serial.println("   AFFICHAGE");
+    Serial.println("==============================");
+
+    Serial.println("[TFT] Initialisation...");
 
     displayInit();
 
+    Serial.println("[TFT] OK");
+
+    Serial.println("[TOUCH] Initialisation...");
+
     touchInit();
+
+    Serial.println("[TOUCH] OK");
 
     menuInit();
 
-    Serial.println();
-    Serial.println("[SYSTEM] READY");
+    Serial.println("[MENU] Pret");
 }
 
 void loop()
 {
-    touchUpdate();
+    menuLoop();
+
+    delay(20);
 }
