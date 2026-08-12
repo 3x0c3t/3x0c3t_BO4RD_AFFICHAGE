@@ -5,25 +5,27 @@
 #include <TFT_eSPI.h>
 
 #include "settings.h"
-#include "benchmark.h"
 
-/*
- * ============================================================
- * 3x0c3t BO4RD - DISPLAY
- * ============================================================
- */
+// ============================================================
+// DISPLAY
+// ============================================================
 
 void displayInit();
 
 void displayClear();
 
+TFT_eSPI& displayGetTFT();
+
 void displayDrawHeader();
+
+void displayDrawLoading(uint8_t percent);
+
+void displayDrawTitle(const char* title);
 
 void displayDrawBenchmarkResult(
     uint8_t index,
-    BenchmarkStatus status
+    BenchmarkStatus status,
+    int value
 );
-
-TFT_eSPI* displayGetTFT();
 
 #endif

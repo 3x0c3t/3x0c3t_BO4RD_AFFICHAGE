@@ -1,29 +1,14 @@
 #include "display.h"
 
-/*
- * ============================================================
- * 3x0c3t BO4RD - DISPLAY
- * ============================================================
- */
+// ============================================================
+// INSTANCE TFT
+// ============================================================
 
 static TFT_eSPI tft = TFT_eSPI();
 
-/*
- * ============================================================
- * ACCÈS TFT
- * ============================================================
- */
-
-TFT_eSPI* displayGetTFT()
-{
-    return &tft;
-}
-
-/*
- * ============================================================
- * INITIALISATION
- * ============================================================
- */
+// ============================================================
+// INITIALISATION
+// ============================================================
 
 void displayInit()
 {
@@ -31,93 +16,142 @@ void displayInit()
 
     tft.setRotation(TFT_ROTATION);
 
-    tft.fillScreen(
-        COLOR_BACKGROUND
-    );
+    tft.fillScreen(COLOR_BACKGROUND);
 
-    tft.setTextColor(
-        COLOR_TEXT,
-        COLOR_BACKGROUND
-    );
+    tft.setTextColor(COLOR_TEXT, COLOR_BACKGROUND);
+
+    tft.setTextSize(1);
 }
 
-/*
- * ============================================================
- * EFFACEMENT
- * ============================================================
- */
+// ============================================================
+// ACCÈS TFT
+// ============================================================
+
+TFT_eSPI& displayGetTFT()
+{
+    return tft;
+}
+
+// ============================================================
+// CLEAR
+// ============================================================
 
 void displayClear()
 {
-    tft.fillScreen(
-        COLOR_BACKGROUND
-    );
+    tft.fillScreen(COLOR_BACKGROUND);
 }
 
-/*
- * ============================================================
- * HEADER
- * ============================================================
- */
+// ============================================================
+// HEADER
+// ============================================================
 
 void displayDrawHeader()
 {
     tft.fillRect(
         0,
-        HEADER1_Y,
-        SCREEN_WIDTH,
-        HEADER1_H,
-        COLOR_HEADER1
-    );
-
-    tft.fillRect(
-        0,
-        HEADER2_Y,
-        SCREEN_WIDTH,
-        HEADER2_H,
-        COLOR_HEADER2
+        HEADER_Y,
+        TFT_WIDTH,
+        HEADER_H,
+        COLOR_BACKGROUND
     );
 
     tft.setTextColor(
-        COLOR_TEXT,
-        COLOR_HEADER1
+        COLOR_TITLE,
+        COLOR_BACKGROUND
     );
 
     tft.setTextSize(1);
 
     tft.setCursor(
         8,
-        8
+        9
     );
 
-    tft.print(
-        "3x0c3t BO4RD"
-    );
+    tft.print(BOARD_NAME);
 
-    tft.setTextColor(
-        COLOR_TEXT,
-        COLOR_HEADER2
-    );
-
-    tft.setCursor(
-        8,
-        HEADER2_Y + 8
-    );
-
-    tft.print(
-        "AFFICHAGE"
+    tft.drawFastHLine(
+        0,
+        LINE1_Y,
+        TFT_WIDTH,
+        COLOR_BORDER
     );
 }
 
-/*
- * ============================================================
- * RÉSULTAT BENCHMARK
- * ============================================================
- */
+// ============================================================
+// BARRE DE CHARGEMENT
+// ============================================================
+
+void displayDrawLoading(uint8_t percent)
+{
+    if (percent > 100)
+    {
+        percent = 100;
+    }
+
+    tft.drawRect(
+        10,
+        LOADING_Y,
+        TFT_WIDTH - 20,
+        LOADING_H,
+        COLOR_BORDER
+    );
+
+    uint16_t width =
+        ((TFT_WIDTH - 22) * percent) / 100;
+
+    tft.fillRect(
+        11,
+        LOADING_Y + 1,
+        width,
+        LOADING_H - 2,
+        COLOR_SELECTED
+    );
+}
+
+// ============================================================
+// TITRE
+// ============================================================
+
+void displayDrawTitle(const char* title)
+{
+    tft.fillRect(
+        0,
+        TITLE_Y,
+        TFT_WIDTH,
+        TITLE_H,
+        COLOR_BACKGROUND
+    );
+
+    tft.setTextColor(
+        COLOR_TITLE,
+        COLOR_BACKGROUND
+    );
+
+    tft.setTextSize(2);
+
+    tft.setCursor(
+        10,
+        TITLE_Y + 6
+    );
+
+    tft.print(title);
+
+    tft.drawFastHLine(
+        0,
+        LINE3_Y,
+        TFT_WIDTH,
+        COLOR_BORDER
+    );
+}
+
+// ============================================================
+// RÉSULTAT BENCHMARK
+// ============================================================
 
 void displayDrawBenchmarkResult(
     uint8_t index,
-    BenchmarkStatus status
+    BenchmarkStatus status,
+    int value
 )
 {
     if (index >= BENCHMARK_COUNT)
@@ -127,13 +161,16 @@ void displayDrawBenchmarkResult(
 
     uint16_t y =
         BENCHMARK_FIRST_Y +
-        index *
-        (BENCHMARK_H + BENCHMARK_GAP);
+        index * (BENCHMARK_H + BENCHMARK_GAP);
 
-    uint16_t color;
+    uint16_t color = COLOR_TEXT;
 
     switch (status)
     {
+        case BENCHMARK_IDLE:
+            color = COLOR_TEXT;
+            break;
+
         case BENCHMARK_RUNNING:
             color = COLOR_RUNNING;
             break;
@@ -147,43 +184,78 @@ void displayDrawBenchmarkResult(
             break;
 
         default:
-            color = COLOR_BORDER;
+            color = COLOR_TEXT;
             break;
     }
 
     tft.drawRect(
-        BENCHMARK_BUTTON_X,
+        BENCHMARK_X,
         y,
-        BENCHMARK_BUTTON_W,
+        BENCHMARK_W,
         BENCHMARK_H,
-        color
+        COLOR_BORDER
     );
 
     tft.setTextColor(
-        COLOR_TEXT,
+        color,
         COLOR_BACKGROUND
     );
 
     tft.setTextSize(1);
 
     tft.setCursor(
-        BENCHMARK_BUTTON_X + 6,
-        y + 10
+        BENCHMARK_X + 6,
+        y + 6
     );
 
-    tft.print(
-        benchmarkName(index)
+    switch (index)
+    {
+        case 0:
+            tft.print("COLORS");
+            break;
+
+        case 1:
+            tft.print("TEXT");
+            break;
+
+        case 2:
+            tft.print("LINES");
+            break;
+
+        case 3:
+            tft.print("RECTANGLES");
+            break;
+
+        case 4:
+            tft.print("CIRCLES");
+            break;
+
+        default:
+            tft.print("TEST");
+            break;
+    }
+
+    tft.setCursor(
+        BENCHMARK_X + 130,
+        y + 6
     );
 
-    tft.fillCircle(
-        BENCHMARK_BUTTON_X +
-        BENCHMARK_BUTTON_W -
-        10,
+    switch (status)
+    {
+        case BENCHMARK_IDLE:
+            tft.print("READY");
+            break;
 
-        y + BENCHMARK_H / 2,
+        case BENCHMARK_RUNNING:
+            tft.print("RUN...");
+            break;
 
-        5,
+        case BENCHMARK_OK:
+            tft.print(value);
+            break;
 
-        color
-    );
+        case BENCHMARK_ERROR:
+            tft.print("ERROR");
+            break;
+    }
 }

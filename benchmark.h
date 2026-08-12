@@ -3,74 +3,22 @@
 
 #include <Arduino.h>
 
-/*
- * ============================================================
- * 3x0c3t BO4RD - BENCHMARK
- * ============================================================
- */
+#include "settings.h"
 
-enum BenchmarkStatus
-{
-    BENCHMARK_IDLE = 0,
-    BENCHMARK_RUNNING,
-    BENCHMARK_OK,
-    BENCHMARK_ERROR
-};
-
-/*
- * ------------------------------------------------------------
- * INITIALISATION
- * ------------------------------------------------------------
- */
+// ============================================================
+// BENCHMARK
+// ============================================================
 
 void benchmarkInit();
 
-/*
- * ------------------------------------------------------------
- * INFORMATIONS
- * ------------------------------------------------------------
- */
-
-uint8_t benchmarkCount();
-
-const char* benchmarkName(uint8_t index);
-
-BenchmarkStatus benchmarkGetStatus(uint8_t index);
-
-bool benchmarkIsSelected(uint8_t index);
-
-/*
- * ------------------------------------------------------------
- * SÉLECTION
- * ------------------------------------------------------------
- */
+void benchmarkRunSelected();
 
 void benchmarkToggle(uint8_t index);
 
-void benchmarkClearAll();
+bool benchmarkIsSelected(uint8_t index);
 
-/*
- * ------------------------------------------------------------
- * EXÉCUTION
- * ------------------------------------------------------------
- */
+BenchmarkStatus benchmarkGetStatus(uint8_t index);
 
-void benchmarkRunSelected();
-
-/*
- * ------------------------------------------------------------
- * BENCHMARKS INDIVIDUELS
- * ------------------------------------------------------------
- */
-
-void benchmarkColors();
-
-void benchmarkText();
-
-void benchmarkLines();
-
-void benchmarkRectangles();
-
-void benchmarkCircles();
+const char* benchmarkName(uint8_t index);
 
 #endif

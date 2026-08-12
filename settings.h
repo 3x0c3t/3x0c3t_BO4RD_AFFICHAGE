@@ -2,123 +2,111 @@
 #define SETTINGS_H
 
 #include <Arduino.h>
+#include <TFT_eSPI.h>
 
-/*
- * ============================================================
- * 3x0c3t BO4RD - AFFICHAGE
- * Configuration générale
- * ============================================================
- */
+// ============================================================
+// 3x0c3t BO4RD - AFFICHAGE
+// Configuration générale
+// ============================================================
 
-/*
- * ------------------------------------------------------------
- * ÉCRAN
- * ------------------------------------------------------------
- */
+// ============================================================
+// VERSION
+// ============================================================
 
-#define SCREEN_WIDTH   240
-#define SCREEN_HEIGHT  320
+#define BOARD_NAME      "3x0c3t BO4RD"
+#define SOFTWARE_NAME   "AFFICHAGE"
+#define SOFTWARE_VERSION "3.1"
 
-#define TFT_ROTATION   0
+// ============================================================
+// DEBUG
+// ============================================================
 
-/*
- * ------------------------------------------------------------
- * COULEURS
- * ------------------------------------------------------------
- */
+#define DEBUG_SERIAL_BAUD 115200
 
-#define COLOR_BACKGROUND   0x0000
-#define COLOR_TEXT         0xFFFF
+// ============================================================
+// TFT
+// ============================================================
 
-#define COLOR_HEADER1      0x001F
-#define COLOR_HEADER2      0x07E0
+#define TFT_WIDTH   240
+#define TFT_HEIGHT  320
 
-#define COLOR_BORDER       0xFFFF
-#define COLOR_SELECTED     0x07FF
+// Rotation demandée
+#define TFT_ROTATION 2
 
-#define COLOR_OK           0x07E0
-#define COLOR_ERROR        0xF800
-#define COLOR_WARNING      0xFFE0
-#define COLOR_RUNNING      0x001F
+// ============================================================
+// TOUCH
+// ============================================================
 
-/*
- * ------------------------------------------------------------
- * HEADER
- * ------------------------------------------------------------
- */
+#define TOUCH_MIN_PRESSURE 200
+#define TOUCH_MAX_PRESSURE 4000
 
-#define HEADER1_Y          0
-#define HEADER1_H          28
+// ============================================================
+// COULEURS
+// ============================================================
 
-#define HEADER2_Y          28
-#define HEADER2_H          28
+#define COLOR_BACKGROUND TFT_BLACK
+#define COLOR_TEXT       TFT_WHITE
+#define COLOR_TITLE      TFT_CYAN
+#define COLOR_BORDER     TFT_DARKGREY
 
-#define HEADER_TITLE_Y     35
+#define COLOR_SELECTED  TFT_BLUE
+#define COLOR_RUNNING   TFT_YELLOW
+#define COLOR_OK        TFT_GREEN
+#define COLOR_WARNING   TFT_ORANGE
+#define COLOR_ERROR     TFT_RED
 
-/*
- * ------------------------------------------------------------
- * ZONE CONTENU
- * ------------------------------------------------------------
- */
+// ============================================================
+// STRUCTURE ÉCRAN
+// ============================================================
 
-#define CONTENT_Y          60
-#define CONTENT_H          200
+#define HEADER_Y        0
+#define HEADER_H        28
 
-/*
- * ------------------------------------------------------------
- * BENCHMARKS
- * ------------------------------------------------------------
- */
+#define LINE1_Y         29
 
-#define BENCHMARK_BUTTON_X       10
-#define BENCHMARK_BUTTON_Y       70
-#define BENCHMARK_BUTTON_W       220
-#define BENCHMARK_BUTTON_H       30
+#define LOADING_Y       32
+#define LOADING_H       8
 
-#define BENCHMARK_H              30
-#define BENCHMARK_GAP            5
+#define LINE2_Y         42
 
-#define BENCHMARK_FIRST_Y        70
+#define TITLE_Y         45
+#define TITLE_H         28
 
-#define BENCHMARK_COUNT          5
+#define LINE3_Y         74
 
-/*
- * ------------------------------------------------------------
- * BOUTON RUN
- * ------------------------------------------------------------
- */
+// ============================================================
+// BENCHMARK
+// ============================================================
 
-#define RUN_BUTTON_X             10
-#define RUN_BUTTON_Y             260
-#define RUN_BUTTON_W             220
-#define RUN_BUTTON_H             40
+#define BENCHMARK_COUNT 5
 
-#define BUTTON_RUN_X             RUN_BUTTON_X
-#define BUTTON_RUN_Y             RUN_BUTTON_Y
-#define BUTTON_RUN_W             RUN_BUTTON_W
-#define BUTTON_RUN_H             RUN_BUTTON_H
+#define BENCHMARK_X     10
+#define BENCHMARK_W     220
 
-/*
- * ------------------------------------------------------------
- * TOUCH
- *
- * IMPORTANT :
- * Ne pas définir TFT_CS / TFT_DC / TFT_RST ici.
- *
- * TFT_eSPI possède déjà sa propre configuration dans
- * User_Setup.h.
- * ------------------------------------------------------------
- */
+#define BENCHMARK_FIRST_Y 85
 
-#define TOUCH_CS_PIN             0
-#define TOUCH_IRQ_PIN            5
+#define BENCHMARK_H     32
+#define BENCHMARK_GAP   6
 
-/*
- * ------------------------------------------------------------
- * DEBUG
- * ------------------------------------------------------------
- */
+#define BUTTON_RUN_X    10
+#define BUTTON_RUN_Y    270
+#define BUTTON_RUN_W    220
+#define BUTTON_RUN_H    36
 
-#define DEBUG_SERIAL_BAUD        115200
+// ============================================================
+// ENUM BENCHMARK
+// ============================================================
+
+enum BenchmarkStatus
+{
+    BENCHMARK_IDLE = 0,
+    BENCHMARK_RUNNING,
+    BENCHMARK_OK,
+    BENCHMARK_ERROR
+};
+
+// ============================================================
+// PROTOTYPES GÉNÉRAUX
+// ============================================================
 
 #endif
