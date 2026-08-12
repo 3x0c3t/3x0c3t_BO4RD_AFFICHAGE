@@ -5,32 +5,13 @@
 #include "touch.h"
 #include "benchmark.h"
 
-static bool menuSelected[BENCHMARK_COUNT];
-
 // ============================================================
-// COULEUR ETAT
+// ANTI DOUBLE-TOUCH
 // ============================================================
 
-static uint16_t statusColor(
-    BenchmarkStatus status
-)
-{
-    switch (status)
-    {
-        case BENCHMARK_RUNNING:
-            return COLOR_RUNNING;
+static unsigned long lastTouch = 0;
 
-        case BENCHMARK_OK:
-            return COLOR_OK;
-
-        case BENCHMARK_ERROR:
-            return COLOR_ERROR;
-
-        case BENCHMARK_IDLE:
-        default:
-            return COLOR_IDLE;
-    }
-}
+#define TOUCH_DEBOUNCE 250
 
 // ============================================================
 // INITIALISATION
@@ -40,250 +21,148 @@ void menuInit()
 {
     benchmarkInit();
 
-    for (uint8_t i = 0; i < BENCHMARK_COUNT; i++)
-    {
-        menuSelected[i] = false;
-    }
-
-    displayDrawHeader();
-
-    for (uint8_t i = 0; i < BENCHMARK_COUNT; i++)
-    {
-        int y =
-            HEADER1_H +
-            HEADER2_H +
-            8 +
-            i * (BENCHMARK_H + BENCHMARK_GAP);
-
-        TFT_eSPI& tft = displayGetTFT();
-
-        tft.drawRoundRect(
-            5,
-            y,
-            SCREEN_WIDTH - 10,
-            BENCHMARK_H,
-            4,
-            COLOR_BORDER
-        );
-
-        tft.setTextColor(TFT_WHITE);
-
-        tft.setTextSize(1);
-
-        tft.setCursor(
-            12,
-            y + 10
-        );
-
-        tft.print("B");
-        tft.print(i + 1);
-        tft.print(" - ");
-
-        tft.print(
-            benchmarkName(i)
-        );
-    }
-
-    int runY =
-        HEADER1_H +
-        HEADER2_H +
-        8 +
-        BENCHMARK_COUNT *
-        (BENCHMARK_H + BENCHMARK_GAP) +
-        5;
-
-    TFT_eSPI& tft = displayGetTFT();
-
-    tft.fillRoundRect(
-        5,
-        runY,
-        SCREEN_WIDTH - 10,
-        BUTTON_RUN_H,
-        5,
-        TFT_DARKGREEN
-    );
-
-    tft.drawRoundRect(
-        5,
-        runY,
-        SCREEN_WIDTH - 10,
-        BUTTON_RUN_H,
-        5,
-        TFT_WHITE
-    );
-
-    tft.setTextColor(TFT_WHITE);
-
-    tft.setTextSize(2);
-
-    tft.setCursor(
-        105,
-        runY + 7
-    );
-
-    tft.print("LANCER !");
+    displayDrawMenu();
 }
 
 // ============================================================
-// DESSIN D'UN BENCHMARK
+// RECHERCHE BENCHMARK
 // ============================================================
 
-static void drawBenchmarkButton(
-    uint8_t index
+static int8_t getBenchmarkAt(
+    uint16_t x,
+    uint16_t y
 )
 {
-    TFT_eSPI& tft = displayGetTFT();
+    if (
+        x < BENCHMARK_BUTTON_X ||
+        x > BENCHMARK_BUTTON_X +
+            BENCHMARK_BUTTON_W
+    )
+    {
+        return -1;
+    }
 
-    int y =
-        HEADER1_H +
-        HEADER2_H +
-        8 +
-        index * (BENCHMARK_H + BENCHMARK_GAP);
+    for (uint8_t i = 0;
+         i < BENCHMARK_COUNT;
+         i++)
+    {
+        uint16_t by =
+            BENCHMARK_FIRST_Y +
+            i *
+            (
+                BENCHMARK_H +
+                BENCHMARK_GAP
+            );
 
-    bool selected =
-        benchmarkIsSelected(index);
+        if (
+            y >= by &&
+            y < by + BENCHMARK_H
+        )
+        {
+            return i;
+        }
+    }
 
-    BenchmarkStatus status =
-        benchmarkGetStatus(index);
-
-    uint16_t background =
-        selected
-            ? COLOR_SELECTED
-            : TFT_BLACK;
-
-    tft.fillRoundRect(
-        5,
-        y,
-        SCREEN_WIDTH - 10,
-        BENCHMARK_H,
-        4,
-        background
-    );
-
-    tft.drawRoundRect(
-        5,
-        y,
-        SCREEN_WIDTH - 10,
-        BENCHMARK_H,
-        4,
-        COLOR_BORDER
-    );
-
-    tft.setTextColor(TFT_WHITE);
-
-    tft.setTextSize(1);
-
-    tft.setCursor(
-        12,
-        y + 10
-    );
-
-    tft.print("B");
-    tft.print(index + 1);
-    tft.print(" - ");
-
-    tft.print(
-        benchmarkName(index)
-    );
-
-    // Carré sélection
-    tft.fillRect(
-        145,
-        y + 8,
-        12,
-        12,
-        selected
-            ? TFT_GREEN
-            : TFT_DARKGREY
-    );
-
-    tft.drawRect(
-        145,
-        y + 8,
-        12,
-        12,
-        TFT_WHITE
-    );
-
-    // Carré statut
-    tft.fillRect(
-        170,
-        y + 8,
-        12,
-        12,
-        statusColor(status)
-    );
-
-    tft.drawRect(
-        170,
-        y + 8,
-        12,
-        12,
-        TFT_WHITE
-    );
+    return -1;
 }
 
 // ============================================================
-// BOUCLE
+// BOUTON LANCER
+// ============================================================
+
+static bool isRunButton(
+    uint16_t x,
+    uint16_t y
+)
+{
+    return
+        x >= RUN_BUTTON_X &&
+        x <= RUN_BUTTON_X +
+             RUN_BUTTON_W &&
+        y >= RUN_BUTTON_Y &&
+        y <= RUN_BUTTON_Y +
+             RUN_BUTTON_H;
+}
+
+// ============================================================
+// LOOP MENU
 // ============================================================
 
 void menuLoop()
 {
-    int16_t x;
-    int16_t y;
+    uint16_t x;
+    uint16_t y;
 
-    if (!touchRead(x, y))
-        return;
-
-    int firstY =
-        HEADER1_H +
-        HEADER2_H +
-        8;
-
-    for (uint8_t i = 0; i < BENCHMARK_COUNT; i++)
+    if (!touchPressed(
+        x,
+        y
+    ))
     {
-        int buttonY =
-            firstY +
-            i * (BENCHMARK_H + BENCHMARK_GAP);
-
-        if (
-            x >= 5 &&
-            x <= SCREEN_WIDTH - 5 &&
-            y >= buttonY &&
-            y <= buttonY + BENCHMARK_H
-        )
-        {
-            benchmarkToggle(i);
-
-            menuSelected[i] =
-                benchmarkIsSelected(i);
-
-            drawBenchmarkButton(i);
-
-            delay(250);
-
-            return;
-        }
+        return;
     }
 
-    int runY =
-        firstY +
-        BENCHMARK_COUNT *
-        (BENCHMARK_H + BENCHMARK_GAP) +
-        5;
+    unsigned long now =
+        millis();
 
     if (
-        x >= 5 &&
-        x <= SCREEN_WIDTH - 5 &&
-        y >= runY &&
-        y <= runY + BUTTON_RUN_H
+        now - lastTouch <
+        TOUCH_DEBOUNCE
     )
     {
+        return;
+    }
+
+    lastTouch = now;
+
+    Serial.print(
+        "[TOUCH] X="
+    );
+
+    Serial.print(x);
+
+    Serial.print(
+        " Y="
+    );
+
+    Serial.println(y);
+
+    // --------------------------------------------------------
+    // BENCHMARK
+    // --------------------------------------------------------
+
+    int8_t benchmark =
+        getBenchmarkAt(
+            x,
+            y
+        );
+
+    if (benchmark >= 0)
+    {
+        benchmarkToggle(
+            (uint8_t)benchmark
+        );
+
+        displayDrawMenu();
+
+        return;
+    }
+
+    // --------------------------------------------------------
+    // LANCER
+    // --------------------------------------------------------
+
+    if (isRunButton(
+        x,
+        y
+    ))
+    {
+        Serial.println(
+            "[BENCH] Lancement"
+        );
+
         benchmarkRunSelected();
 
-        menuInit();
-
-        delay(300);
+        displayDrawMenu();
 
         return;
     }

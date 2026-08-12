@@ -1,10 +1,10 @@
-#ifndef BENCHMARK_MODULE_H
-#define BENCHMARK_MODULE_H
+#ifndef AFFICHAGE_BENCHMARK_H
+#define AFFICHAGE_BENCHMARK_H
 
 #include <Arduino.h>
 
 // ============================================================
-// ETAT D'UN BENCHMARK
+// ETATS BENCHMARK
 // ============================================================
 
 enum BenchmarkStatus
@@ -25,8 +25,6 @@ void benchmarkInit();
 // INFORMATIONS
 // ============================================================
 
-uint8_t benchmarkCount();
-
 const char* benchmarkName(uint8_t index);
 
 bool benchmarkIsSelected(uint8_t index);
@@ -34,29 +32,32 @@ bool benchmarkIsSelected(uint8_t index);
 BenchmarkStatus benchmarkGetStatus(uint8_t index);
 
 // ============================================================
-// SELECTION
+// CONTROLE
 // ============================================================
 
 void benchmarkToggle(uint8_t index);
 
-void benchmarkSelectAll();
+void benchmarkSetStatus(
+    uint8_t index,
+    BenchmarkStatus status
+);
 
 void benchmarkClearAll();
-
-// ============================================================
-// EXECUTION
-// ============================================================
 
 void benchmarkRunSelected();
 
 // ============================================================
-// BENCHMARKS INDIVIDUELS
+// TESTS INDIVIDUELS
 // ============================================================
 
 void benchmarkColors();
+
 void benchmarkText();
+
 void benchmarkLines();
+
 void benchmarkRectangles();
+
 void benchmarkCircles();
 
 #endif

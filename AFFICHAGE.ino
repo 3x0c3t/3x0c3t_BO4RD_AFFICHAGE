@@ -3,38 +3,82 @@
 #include "touch.h"
 #include "menu.h"
 
+// ============================================================
+// SETUP
+// ============================================================
+
 void setup()
 {
-    Serial.begin(115200);
+    Serial.begin(
+        115200
+    );
 
-    delay(500);
+    delay(300);
 
     Serial.println();
-    Serial.println("==============================");
-    Serial.println("   3x0c3t BO4RD");
-    Serial.println("   AFFICHAGE");
-    Serial.println("==============================");
+    Serial.println(
+        "=============================="
+    );
 
-    Serial.println("[TFT] Initialisation...");
+    Serial.println(
+        "  3x0c3t BO4RD AFFICHAGE"
+    );
+
+    Serial.println(
+        "=============================="
+    );
+
+    // --------------------------------------------------------
+    // TFT
+    // --------------------------------------------------------
+
+    Serial.println(
+        "[TFT] Initialisation..."
+    );
 
     displayInit();
 
-    Serial.println("[TFT] OK");
+    Serial.println(
+        "[TFT] OK"
+    );
 
-    Serial.println("[TOUCH] Initialisation...");
+    // --------------------------------------------------------
+    // TOUCH
+    // --------------------------------------------------------
+
+    Serial.println(
+        "[TOUCH] Initialisation..."
+    );
 
     touchInit();
 
-    Serial.println("[TOUCH] OK");
+    Serial.println(
+        "[TOUCH] OK"
+    );
+
+    // --------------------------------------------------------
+    // MENU
+    // --------------------------------------------------------
 
     menuInit();
 
-    Serial.println("[MENU] Pret");
+    Serial.println(
+        "[MENU] OK"
+    );
+
+    Serial.println();
+    Serial.println(
+        "[SYSTEM] Pret."
+    );
 }
+
+// ============================================================
+// LOOP
+// ============================================================
 
 void loop()
 {
     menuLoop();
 
-    delay(20);
+    delay(5);
 }

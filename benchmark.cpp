@@ -2,24 +2,47 @@
 #include "settings.h"
 #include "display.h"
 
+#include <Arduino.h>
 #include <TFT_eSPI.h>
 
 // ============================================================
-// DONNEES
+// NOMS DES BENCHMARKS
 // ============================================================
 
 static const char* benchmarkNames[BENCHMARK_COUNT] =
 {
-    "COULEURS",
-    "TEXTE",
-    "LIGNES",
-    "RECTANGLES",
-    "CERCLES"
+    "B1 - COULEURS",
+    "B2 - TEXTE",
+    "B3 - LIGNES",
+    "B4 - RECTANGLES",
+    "B5 - CERCLES"
 };
 
-static bool benchmarkSelections[BENCHMARK_COUNT];
+// ============================================================
+// SELECTIONS
+// ============================================================
 
-static BenchmarkStatus benchmarkStatuses[BENCHMARK_COUNT];
+static bool benchmarkSelections[BENCHMARK_COUNT] =
+{
+    false,
+    false,
+    false,
+    false,
+    false
+};
+
+// ============================================================
+// ETATS
+// ============================================================
+
+static BenchmarkStatus benchmarkStatuses[BENCHMARK_COUNT] =
+{
+    BENCHMARK_IDLE,
+    BENCHMARK_IDLE,
+    BENCHMARK_IDLE,
+    BENCHMARK_IDLE,
+    BENCHMARK_IDLE
+};
 
 // ============================================================
 // INITIALISATION
@@ -35,62 +58,85 @@ void benchmarkInit()
 }
 
 // ============================================================
-// INFORMATIONS
+// NOM
 // ============================================================
-
-uint8_t benchmarkCount()
-{
-    return BENCHMARK_COUNT;
-}
 
 const char* benchmarkName(uint8_t index)
 {
     if (index >= BENCHMARK_COUNT)
-        return "";
+    {
+        return "INCONNU";
+    }
 
     return benchmarkNames[index];
-}
-
-bool benchmarkIsSelected(uint8_t index)
-{
-    if (index >= BENCHMARK_COUNT)
-        return false;
-
-    return benchmarkSelections[index];
-}
-
-BenchmarkStatus benchmarkGetStatus(uint8_t index)
-{
-    if (index >= BENCHMARK_COUNT)
-        return BENCHMARK_IDLE;
-
-    return benchmarkStatuses[index];
 }
 
 // ============================================================
 // SELECTION
 // ============================================================
 
+bool benchmarkIsSelected(uint8_t index)
+{
+    if (index >= BENCHMARK_COUNT)
+    {
+        return false;
+    }
+
+    return benchmarkSelections[index];
+}
+
+// ============================================================
+// ETAT
+// ============================================================
+
+BenchmarkStatus benchmarkGetStatus(uint8_t index)
+{
+    if (index >= BENCHMARK_COUNT)
+    {
+        return BENCHMARK_ERROR;
+    }
+
+    return benchmarkStatuses[index];
+}
+
+// ============================================================
+// MODIFICATION ETAT
+// ============================================================
+
+void benchmarkSetStatus(
+    uint8_t index,
+    BenchmarkStatus status
+)
+{
+    if (index >= BENCHMARK_COUNT)
+    {
+        return;
+    }
+
+    benchmarkStatuses[index] = status;
+}
+
+// ============================================================
+// TOGGLE
+// ============================================================
+
 void benchmarkToggle(uint8_t index)
 {
     if (index >= BENCHMARK_COUNT)
+    {
         return;
-
-    benchmarkSelections[index] = !benchmarkSelections[index];
-
-    if (!benchmarkSelections[index])
-    {
-        benchmarkStatuses[index] = BENCHMARK_IDLE;
     }
+
+    benchmarkSelections[index] =
+        !benchmarkSelections[index];
+
+    benchmarkStatuses[index] =
+        BENCHMARK_IDLE;
 }
 
-void benchmarkSelectAll()
-{
-    for (uint8_t i = 0; i < BENCHMARK_COUNT; i++)
-    {
-        benchmarkSelections[i] = true;
-    }
-}
+// ============================================================
+// TOUT EFFACER
+// ============================================================
 
 void benchmarkClearAll()
 {
@@ -107,16 +153,39 @@ void benchmarkClearAll()
 
 void benchmarkRunSelected()
 {
+    bool selected = false;
+
+    for (uint8_t i = 0; i < BENCHMARK_COUNT; i++)
+    {
+        if (benchmarkSelections[i])
+        {
+            selected = true;
+            break;
+        }
+    }
+
+    if (!selected)
+    {
+        Serial.println("[BENCH] Aucun benchmark selectionne");
+        return;
+    }
+
     for (uint8_t i = 0; i < BENCHMARK_COUNT; i++)
     {
         if (!benchmarkSelections[i])
+        {
             continue;
+        }
 
-        benchmarkStatuses[i] = BENCHMARK_RUNNING;
+        Serial.print("[BENCH] Execution : ");
+        Serial.println(benchmarkNames[i]);
 
-        displayDrawBenchmarkRunning(i);
+        benchmarkStatuses[i] =
+            BENCHMARK_RUNNING;
 
-        delay(200);
+        displayDrawMenu();
+
+        delay(150);
 
         switch (i)
         {
@@ -139,187 +208,204 @@ void benchmarkRunSelected()
             case 4:
                 benchmarkCircles();
                 break;
+
+            default:
+                benchmarkStatuses[i] =
+                    BENCHMARK_ERROR;
+                break;
         }
 
-        benchmarkStatuses[i] = BENCHMARK_OK;
+        displayDrawMenu();
 
-        displayDrawBenchmarkResult(i, BENCHMARK_OK);
-
-        delay(500);
+        delay(300);
     }
 
-    displayDrawBenchmarkFinished();
+    Serial.println("[BENCH] Execution terminee");
 }
 
 // ============================================================
-// COULEURS
+// B1 - COULEURS
 // ============================================================
 
 void benchmarkColors()
 {
     TFT_eSPI& tft = displayGetTFT();
 
-    uint16_t colors[] =
-    {
-        TFT_BLACK,
-        TFT_RED,
-        TFT_GREEN,
-        TFT_BLUE,
-        TFT_CYAN,
-        TFT_MAGENTA,
-        TFT_YELLOW,
-        TFT_WHITE
-    };
+    unsigned long start = millis();
 
-    const uint8_t count = sizeof(colors) / sizeof(colors[0]);
+    tft.fillScreen(TFT_RED);
+    delay(250);
 
-    uint16_t h = SCREEN_HEIGHT / count;
+    tft.fillScreen(TFT_GREEN);
+    delay(250);
 
-    for (uint8_t i = 0; i < count; i++)
-    {
-        tft.fillRect(
-            0,
-            i * h,
-            SCREEN_WIDTH,
-            h,
-            colors[i]
-        );
+    tft.fillScreen(TFT_BLUE);
+    delay(250);
 
-        delay(120);
-    }
+    tft.fillScreen(TFT_BLACK);
+    delay(100);
 
-    delay(300);
+    unsigned long elapsed =
+        millis() - start;
 
-    displayClear();
+    Serial.print("[BENCH] Couleurs : ");
+    Serial.print(elapsed);
+    Serial.println(" ms");
+
+    benchmarkStatuses[0] =
+        BENCHMARK_OK;
 }
 
 // ============================================================
-// TEXTE
+// B2 - TEXTE
 // ============================================================
 
 void benchmarkText()
 {
     TFT_eSPI& tft = displayGetTFT();
 
-    displayClear();
+    unsigned long start = millis();
 
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.fillScreen(TFT_BLACK);
 
-    for (uint8_t size = 1; size <= 4; size++)
+    tft.setTextColor(
+        TFT_WHITE,
+        TFT_BLACK
+    );
+
+    tft.setTextSize(1);
+
+    for (uint16_t y = 0; y < 220; y += 12)
     {
-        tft.setTextSize(size);
-
         tft.setCursor(
-            10,
-            20 + ((size - 1) * 45)
+            5,
+            y
         );
 
-        tft.print("TEST TEXTE ");
-        tft.print(size);
-
-        delay(300);
+        tft.print(
+            "3x0c3t BO4RD DISPLAY TEST"
+        );
     }
 
-    delay(500);
+    unsigned long elapsed =
+        millis() - start;
 
-    displayClear();
+    Serial.print("[BENCH] Texte : ");
+    Serial.print(elapsed);
+    Serial.println(" ms");
+
+    benchmarkStatuses[1] =
+        BENCHMARK_OK;
 }
 
 // ============================================================
-// LIGNES
+// B3 - LIGNES
 // ============================================================
 
 void benchmarkLines()
 {
     TFT_eSPI& tft = displayGetTFT();
 
-    displayClear();
+    unsigned long start = millis();
 
-    for (int x = 0; x < SCREEN_WIDTH; x += 10)
+    tft.fillScreen(TFT_BLACK);
+
+    for (uint16_t x = 0; x < 320; x += 10)
     {
         tft.drawLine(
             0,
             0,
             x,
-            SCREEN_HEIGHT - 1,
+            239,
+            TFT_WHITE
+        );
+    }
+
+    for (uint16_t y = 0; y < 240; y += 10)
+    {
+        tft.drawLine(
+            0,
+            0,
+            319,
+            y,
             TFT_CYAN
         );
-
-        delay(10);
     }
 
-    for (int x = 0; x < SCREEN_WIDTH; x += 10)
-    {
-        tft.drawLine(
-            SCREEN_WIDTH - 1,
-            0,
-            x,
-            SCREEN_HEIGHT - 1,
-            TFT_YELLOW
-        );
+    unsigned long elapsed =
+        millis() - start;
 
-        delay(10);
-    }
+    Serial.print("[BENCH] Lignes : ");
+    Serial.print(elapsed);
+    Serial.println(" ms");
 
-    delay(500);
-
-    displayClear();
+    benchmarkStatuses[2] =
+        BENCHMARK_OK;
 }
 
 // ============================================================
-// RECTANGLES
+// B4 - RECTANGLES
 // ============================================================
 
 void benchmarkRectangles()
 {
     TFT_eSPI& tft = displayGetTFT();
 
-    displayClear();
+    unsigned long start = millis();
 
-    for (int i = 0; i < 110; i += 10)
+    tft.fillScreen(TFT_BLACK);
+
+    for (uint16_t i = 0; i < 110; i += 5)
     {
         tft.drawRect(
             i,
             i / 2,
-            SCREEN_WIDTH - (2 * i),
-            SCREEN_HEIGHT - i,
+            320 - (i * 2),
+            240 - i,
             TFT_GREEN
         );
-
-        delay(50);
     }
 
-    delay(500);
+    unsigned long elapsed =
+        millis() - start;
 
-    displayClear();
+    Serial.print("[BENCH] Rectangles : ");
+    Serial.print(elapsed);
+    Serial.println(" ms");
+
+    benchmarkStatuses[3] =
+        BENCHMARK_OK;
 }
 
 // ============================================================
-// CERCLES
+// B5 - CERCLES
 // ============================================================
 
 void benchmarkCircles()
 {
     TFT_eSPI& tft = displayGetTFT();
 
-    displayClear();
+    unsigned long start = millis();
 
-    int cx = SCREEN_WIDTH / 2;
-    int cy = SCREEN_HEIGHT / 2;
+    tft.fillScreen(TFT_BLACK);
 
-    for (int r = 10; r < 110; r += 10)
+    for (uint16_t r = 5; r < 115; r += 5)
     {
         tft.drawCircle(
-            cx,
-            cy,
+            160,
+            120,
             r,
-            TFT_MAGENTA
+            TFT_YELLOW
         );
-
-        delay(50);
     }
 
-    delay(500);
+    unsigned long elapsed =
+        millis() - start;
 
-    displayClear();
+    Serial.print("[BENCH] Cercles : ");
+    Serial.print(elapsed);
+    Serial.println(" ms");
+
+    benchmarkStatuses[4] =
+        BENCHMARK_OK;
 }

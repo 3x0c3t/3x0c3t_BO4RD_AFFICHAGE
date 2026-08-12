@@ -1,13 +1,13 @@
-#ifndef TOUCH_MODULE_H
-#define TOUCH_MODULE_H
+#ifndef AFFICHAGE_TOUCH_H
+#define AFFICHAGE_TOUCH_H
 
 #include <Arduino.h>
 
 void touchInit();
 
-bool touchRead(
-    int16_t& x,
-    int16_t& y
+bool touchPressed(
+    uint16_t& x,
+    uint16_t& y
 );
 
 #endif

@@ -3,7 +3,11 @@
 
 #include <TFT_eSPI.h>
 
-static TFT_eSPI touchTft = TFT_eSPI();
+// ============================================================
+// OBJET TFT / TOUCH
+// ============================================================
+
+static TFT_eSPI touchTFT;
 
 // ============================================================
 // INITIALISATION
@@ -11,36 +15,35 @@ static TFT_eSPI touchTft = TFT_eSPI();
 
 void touchInit()
 {
-    pinMode(TOUCH_CS, OUTPUT);
+    touchTFT.init();
 
-    digitalWrite(
-        TOUCH_CS,
-        HIGH
+    touchTFT.setRotation(
+        TFT_ROTATION
     );
 }
 
 // ============================================================
-// LECTURE
+// LECTURE TACTILE
 // ============================================================
 
-bool touchRead(
-    int16_t& x,
-    int16_t& y
+bool touchPressed(
+    uint16_t& x,
+    uint16_t& y
 )
 {
-    uint16_t rawX = 0;
-    uint16_t rawY = 0;
+    uint16_t tx = 0;
+    uint16_t ty = 0;
 
-    if (!touchTft.getTouch(
-        &rawX,
-        &rawY
+    if (!touchTFT.getTouch(
+        &tx,
+        &ty
     ))
     {
         return false;
     }
 
-    x = rawX;
-    y = rawY;
+    x = tx;
+    y = ty;
 
     return true;
 }
