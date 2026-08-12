@@ -102,7 +102,7 @@ void benchmarkToggle(uint8_t index)
 // COLORS
 // ============================================================
 
-static void benchmarkColors()
+void benchmarkColors()
 {
     TFT_eSPI& tft = displayGetTFT();
 
@@ -122,7 +122,7 @@ static void benchmarkColors()
 // TEXT
 // ============================================================
 
-static void benchmarkText()
+void benchmarkText()
 {
     TFT_eSPI& tft = displayGetTFT();
 
@@ -142,7 +142,7 @@ static void benchmarkText()
 // LINES
 // ============================================================
 
-static void benchmarkLines()
+void benchmarkLines()
 {
     TFT_eSPI& tft = displayGetTFT();
 
@@ -175,7 +175,7 @@ static void benchmarkLines()
 // RECTANGLES
 // ============================================================
 
-static void benchmarkRectangles()
+void benchmarkRectangles()
 {
     TFT_eSPI& tft = displayGetTFT();
 
@@ -203,7 +203,7 @@ static void benchmarkRectangles()
 // CIRCLES
 // ============================================================
 
-static void benchmarkCircles()
+void benchmarkCircles()
 {
     TFT_eSPI& tft = displayGetTFT();
 

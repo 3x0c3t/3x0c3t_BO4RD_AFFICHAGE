@@ -1,20 +1,33 @@
-#ifndef DISPLAY_H
-#define DISPLAY_H
+#ifndef BO4RD_DISPLAY_H
+#define BO4RD_DISPLAY_H
 
 #include <Arduino.h>
-#include <TFT_eSPI.h>
 
 #include "settings.h"
+#include "benchmark.h"
+
+#include <TFT_eSPI.h>
+
 
 // ============================================================
-// DISPLAY
+// INITIALISATION
 // ============================================================
 
 void displayInit();
 
-void displayClear();
+
+// ============================================================
+// ACCES TFT
+// ============================================================
 
 TFT_eSPI& displayGetTFT();
+
+
+// ============================================================
+// AFFICHAGE GENERAL
+// ============================================================
+
+void displayClear();
 
 void displayDrawHeader();
 
@@ -22,10 +35,23 @@ void displayDrawLoading(uint8_t percent);
 
 void displayDrawTitle(const char* title);
 
+
+// ============================================================
+// BENCHMARK
+// ============================================================
+
+void displayDrawBenchmarkRunning(
+    uint8_t index
+);
+
 void displayDrawBenchmarkResult(
     uint8_t index,
     BenchmarkStatus status,
-    int value
+    int elapsedMs = 0,
+    int fps = 0
 );
+
+void displayDrawBenchmarkFinished();
+
 
 #endif
