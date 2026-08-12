@@ -1,11 +1,16 @@
-#ifndef BO4RD_BENCHMARK_H
-#define BO4RD_BENCHMARK_H
+#ifndef BENCHMARK_MODULE_H
+#define BENCHMARK_MODULE_H
 
 #include <Arduino.h>
 
 
 // ============================================================
-// ETAT D'UN BENCHMARK
+// 3x0c3t BO4RD - BENCHMARK
+// ============================================================
+
+
+// ============================================================
+// ETATS
 // ============================================================
 
 enum BenchmarkStatus
@@ -30,18 +35,26 @@ void benchmarkInit();
 
 uint8_t benchmarkCount();
 
-const char* benchmarkName(uint8_t index);
+const char* benchmarkName(
+    uint8_t index
+);
 
-bool benchmarkIsSelected(uint8_t index);
+bool benchmarkIsSelected(
+    uint8_t index
+);
 
-BenchmarkStatus benchmarkGetStatus(uint8_t index);
+BenchmarkStatus benchmarkGetStatus(
+    uint8_t index
+);
 
 
 // ============================================================
 // SELECTION
 // ============================================================
 
-void benchmarkToggle(uint8_t index);
+void benchmarkToggle(
+    uint8_t index
+);
 
 void benchmarkSelectAll();
 
@@ -56,7 +69,7 @@ void benchmarkRunSelected();
 
 
 // ============================================================
-// BENCHMARKS INDIVIDUELS
+// BENCHMARKS
 // ============================================================
 
 void benchmarkColors();
@@ -68,6 +81,5 @@ void benchmarkLines();
 void benchmarkRectangles();
 
 void benchmarkCircles();
-
 
 #endif
