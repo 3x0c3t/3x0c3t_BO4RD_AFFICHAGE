@@ -1,112 +1,81 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#include <Arduino.h>
-#include <TFT_eSPI.h>
-
 // ============================================================
 // 3x0c3t BO4RD - AFFICHAGE
-// Configuration générale
+// ESP8266 NodeMCU
+// TFT ILI9341 240x320
+// XPT2046
 // ============================================================
 
 // ============================================================
-// VERSION
+// ECRAN
 // ============================================================
 
-#define BOARD_NAME      "3x0c3t BO4RD"
-#define SOFTWARE_NAME   "AFFICHAGE"
-#define SOFTWARE_VERSION "3.1"
-
-// ============================================================
-// DEBUG
-// ============================================================
-
-#define DEBUG_SERIAL_BAUD 115200
+#define SCREEN_WIDTH    320
+#define SCREEN_HEIGHT   240
+#define TFT_ROTATION    2
 
 // ============================================================
 // TFT
 // ============================================================
 
-#define TFT_WIDTH   240
-#define TFT_HEIGHT  320
-
-// Rotation demandée
-#define TFT_ROTATION 2
+#define TFT_CS          15
+#define TFT_DC           2
+#define TFT_RST         16
 
 // ============================================================
-// TOUCH
+// TOUCH XPT2046
 // ============================================================
 
-#define TOUCH_MIN_PRESSURE 200
-#define TOUCH_MAX_PRESSURE 4000
+#define TOUCH_CS         0
+#define TOUCH_IRQ        5
+
+// ============================================================
+// INTERFACE
+// ============================================================
+
+#define HEADER1_H       28
+#define HEADER2_H       24
+
+#define FOOTER_H        28
+
+#define SCREEN_MARGIN    5
+
+// ============================================================
+// BENCHMARKS
+// ============================================================
+
+#define BENCHMARK_COUNT  5
+#define BENCHMARK_H     28
+#define BENCHMARK_GAP    4
+
+#define BUTTON_RUN_H    30
+
+// ============================================================
+// POSITION PREMIER BENCHMARK
+// ============================================================
+
+#define BENCHMARK_FIRST_Y 
+(HEADER1_H + HEADER2_H + 8)
 
 // ============================================================
 // COULEURS
 // ============================================================
 
 #define COLOR_BACKGROUND TFT_BLACK
+
+#define COLOR_HEADER1    TFT_NAVY
+#define COLOR_HEADER2    TFT_DARKGREY
+
 #define COLOR_TEXT       TFT_WHITE
-#define COLOR_TITLE      TFT_CYAN
-#define COLOR_BORDER     TFT_DARKGREY
 
-#define COLOR_SELECTED  TFT_BLUE
-#define COLOR_RUNNING   TFT_YELLOW
-#define COLOR_OK        TFT_GREEN
-#define COLOR_WARNING   TFT_ORANGE
-#define COLOR_ERROR     TFT_RED
+#define COLOR_SELECTED   TFT_BLUE
+#define COLOR_BORDER     TFT_LIGHTGREY
 
-// ============================================================
-// STRUCTURE ÉCRAN
-// ============================================================
-
-#define HEADER_Y        0
-#define HEADER_H        28
-
-#define LINE1_Y         29
-
-#define LOADING_Y       32
-#define LOADING_H       8
-
-#define LINE2_Y         42
-
-#define TITLE_Y         45
-#define TITLE_H         28
-
-#define LINE3_Y         74
-
-// ============================================================
-// BENCHMARK
-// ============================================================
-
-#define BENCHMARK_COUNT 5
-
-#define BENCHMARK_X     10
-#define BENCHMARK_W     220
-
-#define BENCHMARK_FIRST_Y 85
-
-#define BENCHMARK_H     32
-#define BENCHMARK_GAP   6
-
-#define BUTTON_RUN_X    10
-#define BUTTON_RUN_Y    270
-#define BUTTON_RUN_W    220
-#define BUTTON_RUN_H    36
-
-// ============================================================
-// ENUM BENCHMARK
-// ============================================================
-
-enum BenchmarkStatus
-{
-    BENCHMARK_IDLE = 0,
-    BENCHMARK_RUNNING,
-    BENCHMARK_OK,
-    BENCHMARK_ERROR
-};
-
-// ============================================================
-// PROTOTYPES GÉNÉRAUX
-// ============================================================
+#define COLOR_IDLE       TFT_DARKGREY
+#define COLOR_RUNNING    TFT_YELLOW
+#define COLOR_OK         TFT_GREEN
+#define COLOR_ERROR      TFT_RED
 
 #endif
