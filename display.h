@@ -7,10 +7,6 @@
 #include "settings.h"
 #include "benchmark.h"
 
-// ============================================================
-// DISPLAY
-// ============================================================
-
 void displayInit();
 
 void displayClear();
@@ -24,9 +20,9 @@ void displayDrawLoading(uint8_t percent);
 void displayDrawTitle(const char* title);
 
 void displayDrawBenchmarkResult(
-    uint8_t index,
-    BenchmarkStatus status,
-    int value
+uint8_t index,
+BenchmarkStatus status,
+int value
 );
 
 #endif

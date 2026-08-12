@@ -1,19 +1,10 @@
 #include "settings.h"
 #include "menu.h"
-
 #include "display.h"
 #include "benchmark.h"
 #include "touch.h"
 
-// ============================================================
-// ÉTAT MENU
-// ============================================================
-
 static bool menuInitialized = false;
-
-// ============================================================
-// COULEUR STATUS
-// ============================================================
 
 static uint16_t statusColor(BenchmarkStatus status)
 {
@@ -34,17 +25,10 @@ static uint16_t statusColor(BenchmarkStatus status)
     }
 }
 
-// ============================================================
-// POSITION BENCHMARK
-// ============================================================
-
-static int8_t getBenchmarkAt(
-    uint16_t x,
-    uint16_t y
-)
+static int8_t getBenchmarkAt(uint16_t x, uint16_t y)
 {
     if (x < BENCHMARK_X ||
-        x > BENCHMARK_X + BENCHMARK_W)
+        x >= BENCHMARK_X + BENCHMARK_W)
     {
         return -1;
     }
@@ -56,7 +40,7 @@ static int8_t getBenchmarkAt(
             i * (BENCHMARK_H + BENCHMARK_GAP);
 
         if (y >= buttonY &&
-            y <= buttonY + BENCHMARK_H)
+            y < buttonY + BENCHMARK_H)
         {
             return i;
         }
@@ -64,10 +48,6 @@ static int8_t getBenchmarkAt(
 
     return -1;
 }
-
-// ============================================================
-// DRAW BUTTON
-// ============================================================
 
 static void drawBenchmarkButton(uint8_t index)
 {
@@ -82,31 +62,26 @@ static void drawBenchmarkButton(uint8_t index)
         BENCHMARK_FIRST_Y +
         index * (BENCHMARK_H + BENCHMARK_GAP);
 
+    bool selected =
+        benchmarkIsSelected(index);
+
     uint16_t color =
         statusColor(
             benchmarkGetStatus(index)
         );
 
-    if (benchmarkIsSelected(index))
-    {
-        tft.fillRect(
-            BENCHMARK_X,
-            y,
-            BENCHMARK_W,
-            BENCHMARK_H,
-            COLOR_SELECTED
-        );
-    }
-    else
-    {
-        tft.fillRect(
-            BENCHMARK_X,
-            y,
-            BENCHMARK_W,
-            BENCHMARK_H,
-            COLOR_BACKGROUND
-        );
-    }
+    uint16_t background =
+        selected
+            ? COLOR_SELECTED
+            : COLOR_BACKGROUND;
+
+    tft.fillRect(
+        BENCHMARK_X,
+        y,
+        BENCHMARK_W,
+        BENCHMARK_H,
+        background
+    );
 
     tft.drawRect(
         BENCHMARK_X,
@@ -118,26 +93,48 @@ static void drawBenchmarkButton(uint8_t index)
 
     tft.setTextColor(
         color,
-        benchmarkIsSelected(index)
-            ? COLOR_SELECTED
-            : COLOR_BACKGROUND
+        background
     );
 
     tft.setTextSize(1);
 
     tft.setCursor(
         BENCHMARK_X + 8,
-        y + 10
+        y + 7
     );
 
     tft.print(
         benchmarkName(index)
     );
-}
 
-// ============================================================
-// RUN BUTTON
-// ============================================================
+    tft.setCursor(
+        BENCHMARK_X + 220,
+        y + 7
+    );
+
+    switch (benchmarkGetStatus(index))
+    {
+        case BENCHMARK_IDLE:
+            tft.print("READY");
+            break;
+
+        case BENCHMARK_RUNNING:
+            tft.print("RUN...");
+            break;
+
+        case BENCHMARK_OK:
+            tft.print("OK");
+            break;
+
+        case BENCHMARK_ERROR:
+            tft.print("ERROR");
+            break;
+
+        default:
+            tft.print("?");
+            break;
+    }
+}
 
 static void drawRunButton()
 {
@@ -167,21 +164,15 @@ static void drawRunButton()
     tft.setTextSize(2);
 
     tft.setCursor(
-        BUTTON_RUN_X + 72,
-        BUTTON_RUN_Y + 9
+        BUTTON_RUN_X + 40,
+        BUTTON_RUN_Y + 7
     );
 
     tft.print("RUN");
 }
 
-// ============================================================
-// INIT
-// ============================================================
-
 void menuInit()
 {
-    TFT_eSPI& tft = displayGetTFT();
-
     displayClear();
 
     displayDrawHeader();
@@ -201,10 +192,6 @@ void menuInit()
 
     menuInitialized = true;
 }
-
-// ============================================================
-// LOOP
-// ============================================================
 
 void menuLoop()
 {
@@ -227,11 +214,11 @@ void menuLoop()
     if (benchmark >= 0)
     {
         benchmarkToggle(
-            benchmark
+            (uint8_t)benchmark
         );
 
         drawBenchmarkButton(
-            benchmark
+            (uint8_t)benchmark
         );
 
         delay(150);
@@ -241,9 +228,9 @@ void menuLoop()
 
     if (
         x >= BUTTON_RUN_X &&
-        x <= BUTTON_RUN_X + BUTTON_RUN_W &&
+        x < BUTTON_RUN_X + BUTTON_RUN_W &&
         y >= BUTTON_RUN_Y &&
-        y <= BUTTON_RUN_Y + BUTTON_RUN_H
+        y < BUTTON_RUN_Y + BUTTON_RUN_H
     )
     {
         benchmarkRunSelected();
